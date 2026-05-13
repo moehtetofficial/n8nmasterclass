@@ -1,0 +1,746 @@
+<!DOCTYPE html>
+<html lang="my">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>n8n — Docker Local Install Guide</title>
+<link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;700&family=Noto+Sans+Myanmar:wght@400;700&family=Syne:wght@400;700;800&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --bg: #0a0a0f;
+    --surface: #111118;
+    --surface2: #1a1a24;
+    --border: #2a2a3a;
+    --accent: #ff4d6d;
+    --accent2: #7c3aed;
+    --accent3: #06b6d4;
+    --green: #10b981;
+    --yellow: #f59e0b;
+    --text: #e2e8f0;
+    --muted: #64748b;
+    --code-bg: #0d1117;
+  }
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+  body { background: var(--bg); color: var(--text); font-family: 'Syne', sans-serif; line-height: 1.6; overflow-x: hidden; }
+  body::before {
+    content: ''; position: fixed; inset: 0;
+    background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noise'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noise)' opacity='0.04'/%3E%3C/svg%3E");
+    pointer-events: none; z-index: 0; opacity: 0.4;
+  }
+  .container { max-width: 860px; margin: 0 auto; padding: 0 24px 80px; position: relative; z-index: 1; }
+
+  .progress-bar { position: fixed; top: 0; left: 0; right: 0; height: 3px; background: var(--border); z-index: 100; }
+  .progress-fill { height: 100%; background: linear-gradient(90deg, var(--accent2), var(--accent)); width: 0%; transition: width 0.1s; }
+
+  .hero { padding: 72px 0 52px; border-bottom: 1px solid var(--border); position: relative; }
+  .hero::after { content: ''; position: absolute; top: 0; left: -100px; right: -100px; height: 1px; background: linear-gradient(90deg, transparent, var(--accent2), var(--accent), transparent); }
+  .badge { display: inline-flex; align-items: center; gap: 8px; background: rgba(124,58,237,0.15); border: 1px solid rgba(124,58,237,0.4); color: #a78bfa; font-family: 'JetBrains Mono', monospace; font-size: 11px; letter-spacing: 0.15em; text-transform: uppercase; padding: 6px 14px; border-radius: 4px; margin-bottom: 24px; }
+  .badge::before { content: '▸'; color: var(--accent); }
+  h1 { font-size: clamp(28px, 5vw, 48px); font-weight: 800; line-height: 1.1; letter-spacing: -0.02em; margin-bottom: 16px; }
+  h1 span.hl { background: linear-gradient(135deg, var(--accent), var(--accent2)); -webkit-background-clip: text; -webkit-text-fill-color: transparent; background-clip: text; }
+  .hero-desc { font-size: 15px; color: var(--muted); font-family: 'Noto Sans Myanmar', sans-serif; line-height: 1.9; max-width: 560px; }
+
+  .section-label { display: flex; align-items: flex-start; gap: 14px; margin: 52px 0 20px; }
+  .snum { width: 38px; height: 38px; border-radius: 50%; background: linear-gradient(135deg, var(--accent2), var(--accent)); display: flex; align-items: center; justify-content: center; font-family: 'JetBrains Mono', monospace; font-size: 14px; font-weight: 700; flex-shrink: 0; margin-top: 2px; }
+  .snum.pre { background: linear-gradient(135deg, #1e293b, #334155); border: 1px solid var(--border); font-size: 16px; }
+  .stitle { font-size: 20px; font-weight: 800; letter-spacing: -0.01em; }
+  .ssub { font-size: 13px; color: var(--muted); font-family: 'Noto Sans Myanmar', sans-serif; margin-top: 3px; line-height: 1.7; }
+
+  .prereq-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 14px; margin-bottom: 8px; }
+  @media (max-width: 580px) { .prereq-grid { grid-template-columns: 1fr; } }
+  .pcard { background: var(--surface); border: 1px solid var(--border); border-radius: 10px; padding: 20px; transition: border-color 0.2s, transform 0.2s; }
+  .pcard:hover { border-color: rgba(124,58,237,0.5); transform: translateY(-1px); }
+  .ptop { display: flex; align-items: center; justify-content: space-between; margin-bottom: 10px; }
+  .pbadge { font-family: 'JetBrains Mono', monospace; font-size: 10px; letter-spacing: 0.1em; text-transform: uppercase; padding: 3px 8px; border-radius: 4px; }
+  .pbadge.req { background: rgba(255,77,109,0.15); color: var(--accent); border: 1px solid rgba(255,77,109,0.3); }
+  .pbadge.opt { background: rgba(100,116,139,0.15); color: var(--muted); border: 1px solid var(--border); }
+  .pname { font-size: 15px; font-weight: 700; margin-bottom: 6px; }
+  .pdesc { font-family: 'Noto Sans Myanmar', sans-serif; font-size: 12px; color: var(--muted); line-height: 1.8; margin-bottom: 12px; }
+  .plink { display: inline-flex; align-items: center; gap: 6px; background: rgba(124,58,237,0.12); border: 1px solid rgba(124,58,237,0.35); color: #a78bfa; font-family: 'JetBrains Mono', monospace; font-size: 11px; padding: 6px 12px; border-radius: 6px; text-decoration: none; transition: all 0.15s; }
+  .plink:hover { background: rgba(124,58,237,0.25); border-color: rgba(124,58,237,0.6); color: #c4b5fd; }
+  .plink::after { content: ' ↗'; font-size: 10px; }
+
+  .spec-table { width: 100%; border-collapse: collapse; border: 1px solid var(--border); border-radius: 10px; overflow: hidden; font-size: 13px; margin-top: 8px; }
+  .spec-table th { text-align: left; padding: 10px 16px; background: var(--surface2); font-family: 'JetBrains Mono', monospace; font-size: 10px; letter-spacing: 0.12em; text-transform: uppercase; color: var(--muted); border-bottom: 1px solid var(--border); }
+  .spec-table td { padding: 10px 16px; border-bottom: 1px solid var(--border); font-family: 'Noto Sans Myanmar', sans-serif; line-height: 1.6; vertical-align: middle; }
+  .spec-table tr:last-child td { border-bottom: none; }
+  .spec-table tr:hover td { background: rgba(255,255,255,0.015); }
+  .tok { color: var(--green); font-family: 'JetBrains Mono', monospace; font-size: 12px; }
+  .twn { color: var(--yellow); font-family: 'JetBrains Mono', monospace; font-size: 12px; }
+
+  .step-block { background: var(--surface); border: 1px solid var(--border); border-radius: 12px; margin-bottom: 14px; overflow: hidden; }
+  .step-header { padding: 16px 22px; display: flex; align-items: center; gap: 14px; cursor: pointer; user-select: none; border-bottom: 1px solid transparent; transition: border-color 0.2s, background 0.15s; }
+  .step-header:hover { background: rgba(255,255,255,0.02); }
+  .step-block.open .step-header { border-bottom-color: var(--border); }
+  .sicon { font-size: 20px; width: 30px; text-align: center; flex-shrink: 0; }
+  .sinfo { flex: 1; }
+  .sname { font-size: 15px; font-weight: 700; font-family: 'Noto Sans Myanmar', sans-serif; }
+  .smeta { font-size: 11px; color: var(--muted); font-family: 'JetBrains Mono', monospace; margin-top: 2px; }
+  .stoggle { font-family: 'JetBrains Mono', monospace; font-size: 20px; color: var(--muted); transition: transform 0.2s, color 0.2s; line-height: 1; }
+  .step-block.open .stoggle { transform: rotate(45deg); color: var(--accent); }
+  .sbody { display: none; padding: 22px; }
+  .step-block.open .sbody { display: block; }
+
+  .os-tabs { display: flex; gap: 8px; margin-bottom: 14px; flex-wrap: wrap; }
+  .os-tab { padding: 6px 14px; border-radius: 6px; font-family: 'JetBrains Mono', monospace; font-size: 12px; cursor: pointer; border: 1px solid var(--border); background: transparent; color: var(--muted); transition: all 0.15s; }
+  .os-tab:hover { border-color: var(--accent2); color: var(--text); }
+  .os-tab.active { background: rgba(124,58,237,0.2); border-color: var(--accent2); color: #a78bfa; }
+  .os-content { display: none; }
+  .os-content.active { display: block; }
+
+  .code-block { background: var(--code-bg); border: 1px solid var(--border); border-radius: 8px; overflow: hidden; margin: 10px 0; }
+  .code-header { display: flex; align-items: center; justify-content: space-between; padding: 9px 14px; border-bottom: 1px solid var(--border); }
+  .clabel { font-family: 'JetBrains Mono', monospace; font-size: 10px; color: var(--muted); letter-spacing: 0.1em; text-transform: uppercase; }
+  .copy-btn { background: none; border: 1px solid var(--border); color: var(--muted); font-family: 'JetBrains Mono', monospace; font-size: 11px; padding: 3px 10px; border-radius: 4px; cursor: pointer; transition: all 0.15s; }
+  .copy-btn:hover { border-color: var(--accent3); color: var(--accent3); }
+  .copy-btn.copied { border-color: var(--green); color: var(--green); }
+  pre { padding: 16px; overflow-x: auto; font-family: 'JetBrains Mono', monospace; font-size: 13px; line-height: 1.8; }
+  .cm { color: #6e7681; }
+  .kw { color: #79c0ff; }
+  .fl { color: #ffa657; }
+  .st { color: #a5d6ff; }
+  .ok { color: var(--green); }
+
+  code { background: rgba(124,58,237,0.15); color: #c4b5fd; font-family: 'JetBrains Mono', monospace; font-size: 12px; padding: 2px 7px; border-radius: 4px; border: 1px solid rgba(124,58,237,0.25); }
+
+  .alert { display: flex; gap: 12px; padding: 13px 16px; border-radius: 8px; margin: 12px 0; font-family: 'Noto Sans Myanmar', sans-serif; font-size: 13px; line-height: 1.8; }
+  .alert.warn { background: rgba(245,158,11,0.08); border: 1px solid rgba(245,158,11,0.3); color: #fcd34d; }
+  .alert.info { background: rgba(6,182,212,0.08); border: 1px solid rgba(6,182,212,0.3); color: #67e8f9; }
+  .alert.success { background: rgba(16,185,129,0.08); border: 1px solid rgba(16,185,129,0.3); color: #6ee7b7; }
+  .alert.tip { background: rgba(124,58,237,0.08); border: 1px solid rgba(124,58,237,0.3); color: #c4b5fd; }
+  .ai { font-size: 15px; flex-shrink: 0; margin-top: 2px; }
+
+  .substep { display: flex; gap: 14px; padding: 14px 0; border-bottom: 1px solid var(--border); }
+  .substep:first-child { padding-top: 0; }
+  .substep:last-child { border-bottom: none; padding-bottom: 0; }
+  .ssn { width: 24px; height: 24px; border-radius: 50%; background: var(--surface2); border: 1px solid var(--border); display: flex; align-items: center; justify-content: center; font-family: 'JetBrains Mono', monospace; font-size: 11px; font-weight: 700; color: var(--muted); flex-shrink: 0; margin-top: 1px; }
+  .ssc { flex: 1; }
+  .sst { font-size: 14px; font-weight: 700; font-family: 'Noto Sans Myanmar', sans-serif; margin-bottom: 6px; }
+  .ssd { font-family: 'Noto Sans Myanmar', sans-serif; font-size: 13px; color: var(--muted); line-height: 1.8; }
+
+  .divider { height: 1px; background: linear-gradient(90deg, transparent, var(--border), transparent); margin: 40px 0; }
+
+  .success-banner { margin-top: 48px; background: linear-gradient(135deg, rgba(16,185,129,0.07), rgba(6,182,212,0.07)); border: 1px solid rgba(16,185,129,0.25); border-radius: 16px; padding: 36px; text-align: center; }
+  .success-banner .big-icon { font-size: 44px; margin-bottom: 14px; }
+  .success-banner h2 { font-size: 20px; font-weight: 800; margin-bottom: 8px; color: #6ee7b7; }
+  .success-banner p { font-family: 'Noto Sans Myanmar', sans-serif; font-size: 14px; color: var(--muted); margin-bottom: 20px; line-height: 1.8; }
+  .url-pill { display: inline-flex; align-items: center; gap: 10px; background: var(--code-bg); border: 1px solid rgba(16,185,129,0.4); border-radius: 8px; padding: 10px 22px; font-family: 'JetBrains Mono', monospace; font-size: 15px; color: var(--green); text-decoration: none; transition: all 0.15s; }
+  .url-pill:hover { background: rgba(16,185,129,0.1); }
+
+  .sbody > p { font-family: 'Noto Sans Myanmar', sans-serif; font-size: 13px; color: var(--muted); line-height: 1.9; margin-bottom: 14px; }
+  .sbody > p strong { color: var(--text); }
+</style>
+</head>
+<body>
+
+<div class="progress-bar"><div class="progress-fill" id="prog"></div></div>
+
+<div class="container">
+
+  <section class="hero">
+    <div class="badge">Method 01 · Local + Isolated</div>
+    <h1>n8n on <span class="hl">Docker</span><br>Local Install Guide</h1>
+    <p class="hero-desc">ကိုယ့် PC မှာ Docker သုံးပြီး n8n run နည်း — system မထိဘဲ clean environment ထဲမှာ install လုပ်ပြီး workflow တွေ locally ကျင့်နိုင်မည့် နည်းလမ်း</p>
+  </section>
+
+  <!-- PC SPECS -->
+  <div class="section-label">
+    <div class="snum pre">⚙</div>
+    <div>
+      <div class="stitle">PC Specs စစ်ဆေးပါ</div>
+      <div class="ssub">install မလုပ်ခင် ကိုယ့် PC က requirement တွေ ပြည့်မပြည့် ကြည့်ပါ</div>
+    </div>
+  </div>
+
+  <table class="spec-table">
+    <thead><tr><th>အပိုင်း</th><th>အနည်းဆုံး</th><th>ကောင်းမွန်သော</th><th>ဘယ်မှာ စစ်မလဲ</th></tr></thead>
+    <tbody>
+      <tr>
+        <td><strong>RAM</strong></td>
+        <td><span class="twn">4 GB</span></td>
+        <td><span class="tok">8 GB+</span></td>
+        <td>Task Manager → Performance → Memory</td>
+      </tr>
+      <tr>
+        <td><strong>Disk (free)</strong></td>
+        <td><span class="twn">10 GB</span></td>
+        <td><span class="tok">20 GB+</span></td>
+        <td>File Explorer → This PC → C: drive</td>
+      </tr>
+      <tr>
+        <td><strong>CPU</strong></td>
+        <td>2 cores</td>
+        <td>4 cores+</td>
+        <td>Task Manager → Performance → CPU → Cores</td>
+      </tr>
+      <tr>
+        <td><strong>OS</strong></td>
+        <td colspan="2">Windows 10/11 · macOS 12+ · Ubuntu 20.04+</td>
+        <td>Settings → About</td>
+      </tr>
+      <tr>
+        <td><strong>Internet</strong></td>
+        <td colspan="2">Docker image pull ဖို့ လိုသည် (~600 MB)</td>
+        <td>Browser ဖွင့်ကြည့်</td>
+      </tr>
+    </tbody>
+  </table>
+
+  <!-- PREREQUISITES -->
+  <div class="section-label">
+    <div class="snum pre">📦</div>
+    <div>
+      <div class="stitle">ကြိုတင်လိုအပ်သောအရာများ</div>
+      <div class="ssub">install မလုပ်ခင် ဒီ software တွေ အကောင့်တွေ ရှိထားဖို့ လိုသည်</div>
+    </div>
+  </div>
+
+  <div class="prereq-grid">
+
+    <div class="pcard">
+      <div class="ptop"><span style="font-size:22px">🐳</span><span class="pbadge req">လိုအပ်သည်</span></div>
+      <div class="pname">Docker Desktop</div>
+      <div class="pdesc">n8n ကို container ထဲ run ဖို့ Docker Desktop လိုသည်။ Windows နဲ့ Mac မှာ installer ကို download လုပ်ပြီး install လုပ်ရမည်</div>
+      <a class="plink" href="https://www.docker.com/products/docker-desktop/" target="_blank">docker.com ကနေ Download</a>
+    </div>
+
+    <div class="pcard">
+      <div class="ptop"><span style="font-size:22px">🌐</span><span class="pbadge req">လိုအပ်သည်</span></div>
+      <div class="pname">Docker Hub Account</div>
+      <div class="pdesc">Docker image pull လုပ်ဖို့ Docker Hub account ဖွင့်ထားဖို့ လိုသည်။ Free account ပဲ လုံလောက်သည်</div>
+      <a class="plink" href="https://hub.docker.com/signup" target="_blank">Free Account ဖွင့်ပါ</a>
+    </div>
+
+    <div class="pcard">
+      <div class="ptop"><span style="font-size:22px">💻</span><span class="pbadge req">လိုအပ်သည်</span></div>
+      <div class="pname">Terminal / PowerShell</div>
+      <div class="pdesc">Command တွေ run ဖို့ terminal လိုသည်။ Windows မှာ PowerShell ကို <strong>Administrator</strong> အဖြစ် run ရမည်</div>
+      <a class="plink" href="#ps-section" onclick="document.getElementById('ps-section').scrollIntoView({behavior:'smooth'});return false;">ဘယ်လို ဖွင့်မလဲ ↓</a>
+    </div>
+
+    <div class="pcard">
+      <div class="ptop"><span style="font-size:22px">🌍</span><span class="pbadge opt">မဖြစ်မနေ မလို</span></div>
+      <div class="pname">Web Browser</div>
+      <div class="pdesc">n8n UI ကို browser ကနေ access လုပ်သည်။ Chrome, Edge, Firefox မည်သည်မဆို ရသည် — PC မှာ ရှိပြီးသားဖြစ်မည်</div>
+    </div>
+
+  </div>
+
+  <div class="alert tip" style="margin-top: 8px;">
+    <span class="ai">💡</span>
+    <span>n8n ဖို့ email account အသစ် ဖွင့်ဖို့ မလိုဘူး — Docker Hub ရဲ့ free account တစ်ခုပဲ ဖွင့်ထားရင် ပြည့်တယ်</span>
+  </div>
+
+  <div class="divider"></div>
+
+  <!-- HOW TO OPEN POWERSHELL -->
+  <div class="section-label" id="ps-section">
+    <div class="snum pre">🪟</div>
+    <div>
+      <div class="stitle">PowerShell ဘယ်လို ဖွင့်မလဲ</div>
+      <div class="ssub">Windows သုံးသူများ — Administrator အဖြစ် run မှ Docker commands အလုပ်လုပ်မည်</div>
+    </div>
+  </div>
+
+  <div class="step-block open" id="ps-block">
+    <div class="step-header" onclick="toggle('ps-block')">
+      <div class="sicon">🔐</div>
+      <div class="sinfo">
+        <div class="sname">Administrator PowerShell ဖွင့်နည်း</div>
+        <div class="smeta">Start Menu → Search → Right Click → Run as administrator</div>
+      </div>
+      <div class="stoggle">+</div>
+    </div>
+    <div class="sbody">
+      <div class="substep">
+        <div class="ssn">1</div>
+        <div class="ssc">
+          <div class="sst">Windows Search ဖွင့်ပါ</div>
+          <div class="ssd">Taskbar အောက်ခြေမှာ <strong>🔍 Search icon</strong> နှိပ်ပါ — ဒါမှမဟုတ် keyboard မှာ <code>Windows key</code> နှိပ်ပါ</div>
+        </div>
+      </div>
+      <div class="substep">
+        <div class="ssn">2</div>
+        <div class="ssc">
+          <div class="sst">"powershell" လို့ ရိုက်ထည့်ပါ</div>
+          <div class="ssd">Search box မှာ <code>powershell</code> လို့ ရိုက်ပါ — <strong>Windows PowerShell</strong> ပေါ်လာမည်</div>
+        </div>
+      </div>
+      <div class="substep">
+        <div class="ssn">3</div>
+        <div class="ssc">
+          <div class="sst">Right Click → "Run as administrator" ရွေးပါ</div>
+          <div class="ssd">Windows PowerShell ကို <strong>Left Click မနှိပ်နဲ့</strong> — <strong>Right Click</strong> နှိပ်ပြီး <strong>"Run as administrator"</strong> ကို ရွေးပါ</div>
+          <div class="alert warn" style="margin-top: 8px;">
+            <span class="ai">⚠️</span>
+            <span>"Do you want to allow this app to make changes?" popup ထွက်ရင် <strong>Yes</strong> နှိပ်ပါ</span>
+          </div>
+        </div>
+      </div>
+      <div class="substep">
+        <div class="ssn">4</div>
+        <div class="ssc">
+          <div class="sst">Title bar မှာ "Administrator" ပါကြောင်း စစ်ဆေးပါ</div>
+          <div class="ssd">PowerShell window ထွက်လာပြီး title bar မှာ <code>Administrator: Windows PowerShell</code> လို့ ပါနေရမည်။ ဒါမပါရင် ပြန်ကြိုးစားပါ</div>
+        </div>
+      </div>
+      <div class="alert info" style="margin-top: 4px;">
+        <span class="ai">ℹ️</span>
+        <span>Mac သုံးသူများ — <strong>Terminal</strong> ကို Spotlight Search (<code>Cmd + Space</code>) ကနေ "terminal" ရိုက်ပြီး ဖွင့်နိုင်သည်</span>
+      </div>
+    </div>
+  </div>
+
+  <div class="divider"></div>
+
+  <!-- STEP 1 -->
+  <div class="section-label">
+    <div class="snum">1</div>
+    <div>
+      <div class="stitle">Docker Desktop Install</div>
+      <div class="ssub">OS အလိုက် ရွေးပြီး download → install လုပ်ပါ</div>
+    </div>
+  </div>
+
+  <div class="step-block open" id="s1">
+    <div class="step-header" onclick="toggle('s1')">
+      <div class="sicon">🐳</div>
+      <div class="sinfo">
+        <div class="sname">Docker Desktop Download & Install</div>
+        <div class="smeta">docker.com/products/docker-desktop</div>
+      </div>
+      <div class="stoggle">+</div>
+    </div>
+    <div class="sbody">
+      <div class="os-tabs">
+        <button class="os-tab active" onclick="switchOS(this,'d_win')">🪟 Windows</button>
+        <button class="os-tab" onclick="switchOS(this,'d_mac')">🍎 macOS</button>
+        <button class="os-tab" onclick="switchOS(this,'d_linux')">🐧 Linux (Ubuntu)</button>
+      </div>
+
+      <div class="os-content active" id="d_win">
+        <div class="substep">
+          <div class="ssn">1</div>
+          <div class="ssc">
+            <div class="sst">Download လုပ်ပါ</div>
+            <div class="ssd" style="margin-bottom: 10px;">အောက်ပါ link ကို နှိပ်ပြီး Docker Desktop for Windows ကို download လုပ်ပါ</div>
+            <a class="plink" href="https://www.docker.com/products/docker-desktop/" target="_blank">Docker Desktop for Windows Download</a>
+          </div>
+        </div>
+        <div class="substep">
+          <div class="ssn">2</div>
+          <div class="ssc">
+            <div class="sst">Install file run ပါ</div>
+            <div class="ssd">Download ဆင်းလာတဲ့ <code>Docker Desktop Installer.exe</code> ကို double-click နှိပ်ပြီး install လုပ်ပါ — Next → Next → Finish</div>
+          </div>
+        </div>
+        <div class="substep">
+          <div class="ssn">3</div>
+          <div class="ssc">
+            <div class="sst">WSL2 Install (ပေါ်လာရင်)</div>
+            <div class="ssd">Install ဆဲမှာ "WSL2 installation is incomplete" popup ထွက်ရင် —</div>
+            <a class="plink" href="https://aka.ms/wsl2kernel" target="_blank" style="margin-top: 8px; display: inline-flex;">WSL2 Kernel Update Download</a>
+            <div class="ssd" style="margin-top: 8px;">ဒီ link ကနေ WSL2 kernel update ကို download → install လုပ်ပါ။ ပြီးရင် Docker Desktop install ဆက်လုပ်ပါ</div>
+          </div>
+        </div>
+        <div class="substep">
+          <div class="ssn">4</div>
+          <div class="ssc">
+            <div class="sst">PC Restart + Docker Desktop ဖွင့်ပါ</div>
+            <div class="ssd">Install ပြီးရင် PC restart လုပ်ပါ — Desktop မှာ Docker icon ပေါ်လာမည်။ Double-click နှိပ်ပြီး Docker Desktop ဖွင့်ပါ။ Taskbar system tray (ညာဘက်အောက်) မှာ whale 🐳 icon ပေါ်ရင် Docker ready ဖြစ်ပြီ</div>
+          </div>
+        </div>
+        <div class="substep">
+          <div class="ssn">5</div>
+          <div class="ssc">
+            <div class="sst">Version Check — PowerShell (Administrator) မှာ run ပါ</div>
+            <div class="code-block" style="margin-top: 8px;">
+              <div class="code-header"><span class="clabel">PowerShell — Administrator</span><button class="copy-btn" onclick="copyCode(this)">copy</button></div>
+              <pre><span class="kw">docker</span> <span class="fl">--version</span>
+<span class="cm"># ဒါပုံစံ ထွက်ရမည် —</span>
+<span class="ok">Docker version 27.x.x, build xxxxxxx</span></pre>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="os-content" id="d_mac">
+        <div class="substep">
+          <div class="ssn">1</div>
+          <div class="ssc">
+            <div class="sst">Chip စစ်ပြီး Download</div>
+            <div class="ssd" style="margin-bottom: 10px;">Apple menu → "About This Mac" → chip ကြည့်ပါ — M1/M2/M3 ဆိုရင် Apple Silicon, Intel ဆိုရင် Intel ကို ရွေးပါ</div>
+            <a class="plink" href="https://desktop.docker.com/mac/main/arm64/Docker.dmg" target="_blank" style="margin-right: 8px;">Apple Silicon (M1/M2/M3)</a>
+            <a class="plink" href="https://desktop.docker.com/mac/main/amd64/Docker.dmg" target="_blank">Intel</a>
+          </div>
+        </div>
+        <div class="substep">
+          <div class="ssn">2</div>
+          <div class="ssc">
+            <div class="sst">Install လုပ်ပါ</div>
+            <div class="ssd"><code>Docker.dmg</code> ကို double-click → Docker icon ကို Applications folder ထဲ drag ထည့်ပါ → Applications ကနေ Docker ဖွင့်ပါ</div>
+          </div>
+        </div>
+        <div class="substep">
+          <div class="ssn">3</div>
+          <div class="ssc">
+            <div class="sst">Version Check</div>
+            <div class="code-block" style="margin-top: 8px;">
+              <div class="code-header"><span class="clabel">Terminal</span><button class="copy-btn" onclick="copyCode(this)">copy</button></div>
+              <pre><span class="kw">docker</span> <span class="fl">--version</span>
+<span class="ok">Docker version 27.x.x, build xxxxxxx</span></pre>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="os-content" id="d_linux">
+        <div class="substep">
+          <div class="ssn">1</div>
+          <div class="ssc">
+            <div class="sst">Terminal ဖွင့်ပြီး Install လုပ်ပါ</div>
+            <div class="code-block" style="margin-top: 8px;">
+              <div class="code-header"><span class="clabel">Terminal</span><button class="copy-btn" onclick="copyCode(this)">copy</button></div>
+              <pre><span class="kw">sudo</span> apt-get update
+<span class="kw">sudo</span> apt-get install <span class="fl">-y</span> docker.io
+<span class="kw">sudo</span> systemctl start docker
+<span class="kw">sudo</span> systemctl enable docker
+
+<span class="cm"># sudo မပါဘဲ run ချင်ရင် (optional)</span>
+<span class="kw">sudo</span> usermod <span class="fl">-aG</span> docker $USER
+<span class="cm"># logout → login ပြန်လုပ်ပါ</span>
+
+<span class="kw">docker</span> <span class="fl">--version</span>
+<span class="ok">Docker version xx.x.x ...</span></pre>
+            </div>
+          </div>
+        </div>
+      </div>
+
+    </div>
+  </div>
+
+  <!-- STEP 2 -->
+  <div class="section-label">
+    <div class="snum">2</div>
+    <div>
+      <div class="stitle">Docker Hub Login</div>
+      <div class="ssub">n8n image pull ဖို့ Docker Hub account ဖြင့် login လုပ်ရမည်</div>
+    </div>
+  </div>
+
+  <div class="step-block" id="s2">
+    <div class="step-header" onclick="toggle('s2')">
+      <div class="sicon">🔐</div>
+      <div class="sinfo">
+        <div class="sname">Docker Desktop မှာ Sign In လုပ်ပါ</div>
+        <div class="smeta">hub.docker.com account သုံး</div>
+      </div>
+      <div class="stoggle">+</div>
+    </div>
+    <div class="sbody">
+      <div class="substep">
+        <div class="ssn">1</div>
+        <div class="ssc">
+          <div class="sst">Account မရှိသေးရင် ဖွင့်ပါ</div>
+          <div class="ssd" style="margin-bottom: 8px;">Free account — email နဲ့ signup လုပ်ရုံပဲ</div>
+          <a class="plink" href="https://hub.docker.com/signup" target="_blank">Docker Hub Signup</a>
+        </div>
+      </div>
+      <div class="substep">
+        <div class="ssn">2</div>
+        <div class="ssc">
+          <div class="sst">Docker Desktop မှာ Sign In လုပ်ပါ</div>
+          <div class="ssd">Docker Desktop ဖွင့်ပြီး top-right မှာ <strong>"Sign In"</strong> button နှိပ်ပါ → Docker Hub username/password ထည့်ပြီး login လုပ်ပါ</div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- STEP 3 -->
+  <div class="section-label">
+    <div class="snum">3</div>
+    <div>
+      <div class="stitle">n8n Data Folder ဆောက်ပါ</div>
+      <div class="ssub">Workflow data သိမ်းမည့် folder — ဒါမပါရင် container ပိတ်တိုင်း data ပျောက်မည်</div>
+    </div>
+  </div>
+
+  <div class="step-block" id="s3">
+    <div class="step-header" onclick="toggle('s3')">
+      <div class="sicon">📁</div>
+      <div class="sinfo">
+        <div class="sname">Data folder တည်ဆောက်ပါ</div>
+        <div class="smeta">~/.n8n · volume mount အတွက်</div>
+      </div>
+      <div class="stoggle">+</div>
+    </div>
+    <div class="sbody">
+      <div class="os-tabs">
+        <button class="os-tab active" onclick="switchOS(this,'f_win')">🪟 Windows (PowerShell)</button>
+        <button class="os-tab" onclick="switchOS(this,'f_mac')">🍎 macOS / Linux</button>
+      </div>
+      <div class="os-content active" id="f_win">
+        <div class="code-block">
+          <div class="code-header"><span class="clabel">PowerShell — Administrator</span><button class="copy-btn" onclick="copyCode(this)">copy</button></div>
+          <pre><span class="kw">mkdir</span> $HOME\.n8n
+<span class="cm"># C:\Users\YourName\.n8n ဆောက်မည်</span></pre>
+        </div>
+      </div>
+      <div class="os-content" id="f_mac">
+        <div class="code-block">
+          <div class="code-header"><span class="clabel">Terminal</span><button class="copy-btn" onclick="copyCode(this)">copy</button></div>
+          <pre><span class="kw">mkdir</span> <span class="fl">-p</span> ~/.n8n
+<span class="cm"># /home/yourname/.n8n ဆောက်မည်</span></pre>
+        </div>
+      </div>
+      <div class="alert info" style="margin-top: 4px;">
+        <span class="ai">ℹ️</span>
+        <span>ဤ folder ထဲမှာ workflow, credentials, settings အားလုံး သိမ်းမည်။ Container ဖျက်ပစ်လည်း data ကျန်မည်</span>
+      </div>
+    </div>
+  </div>
+
+  <!-- STEP 4 -->
+  <div class="section-label">
+    <div class="snum">4</div>
+    <div>
+      <div class="stitle">n8n Container Run</div>
+      <div class="ssub">အဓိက command — ဒါပဲ run ရမည်</div>
+    </div>
+  </div>
+
+  <div class="step-block" id="s4">
+    <div class="step-header" onclick="toggle('s4')">
+      <div class="sicon">🚀</div>
+      <div class="sinfo">
+        <div class="sname">n8n Docker container စတင်</div>
+        <div class="smeta">docker run command</div>
+      </div>
+      <div class="stoggle">+</div>
+    </div>
+    <div class="sbody">
+      <div class="os-tabs">
+        <button class="os-tab active" onclick="switchOS(this,'r_win')">🪟 Windows (PowerShell)</button>
+        <button class="os-tab" onclick="switchOS(this,'r_mac')">🍎 macOS / Linux</button>
+      </div>
+      <div class="os-content active" id="r_win">
+        <div class="code-block">
+          <div class="code-header"><span class="clabel">PowerShell — Administrator</span><button class="copy-btn" onclick="copyCode(this)">copy</button></div>
+          <pre><span class="kw">docker</span> run <span class="fl">-d</span> `
+  <span class="fl">--name</span> n8n `
+  <span class="fl">--restart</span> unless-stopped `
+  <span class="fl">-p</span> <span class="st">5678:5678</span> `
+  <span class="fl">-v</span> <span class="st">"$HOME\.n8n:/home/node/.n8n"</span> `
+  <span class="fl">-e</span> <span class="st">GENERIC_TIMEZONE="Asia/Yangon"</span> `
+  <span class="fl">-e</span> <span class="st">TZ="Asia/Yangon"</span> `
+  docker.n8n.io/n8nio/n8n</pre>
+        </div>
+        <div class="alert warn">
+          <span class="ai">⚠️</span>
+          <span>PowerShell မှာ line continuation character က backtick <code>`</code> ဖြစ်သည် — copy ပြီး တစ်ကြောင်းတည်း ကူးထည့်နိုင်သည်</span>
+        </div>
+      </div>
+      <div class="os-content" id="r_mac">
+        <div class="code-block">
+          <div class="code-header"><span class="clabel">Terminal</span><button class="copy-btn" onclick="copyCode(this)">copy</button></div>
+          <pre><span class="kw">docker</span> run <span class="fl">-d</span> \
+  <span class="fl">--name</span> n8n \
+  <span class="fl">--restart</span> unless-stopped \
+  <span class="fl">-p</span> <span class="st">5678:5678</span> \
+  <span class="fl">-v</span> <span class="st">~/.n8n:/home/node/.n8n</span> \
+  <span class="fl">-e</span> <span class="st">GENERIC_TIMEZONE="Asia/Yangon"</span> \
+  <span class="fl">-e</span> <span class="st">TZ="Asia/Yangon"</span> \
+  docker.n8n.io/n8nio/n8n</pre>
+        </div>
+      </div>
+
+      <p style="margin-top: 16px;"><strong>Flag တစ်ခုချင်စီ ဘာလုပ်သလဲ</strong></p>
+      <table class="spec-table" style="margin-top: 8px;">
+        <thead><tr><th>Flag</th><th>အဓိပ္ပာယ်</th></tr></thead>
+        <tbody>
+          <tr><td><code>-d</code></td><td>Background မှာ run — terminal ပိတ်လည်း n8n ဆက် run နေမည်</td></tr>
+          <tr><td><code>--name n8n</code></td><td>Container ကို "n8n" လို့ အမည်ပေး — နောက်မှာ ဒီအမည်နဲ့ control လုပ်မည်</td></tr>
+          <tr><td><code>--restart unless-stopped</code></td><td>PC restart တိုင်း n8n auto-start ဖြစ်မည်</td></tr>
+          <tr><td><code>-p 5678:5678</code></td><td>PC port 5678 ကို container ထဲ map — browser ကနေ access ရမည်</td></tr>
+          <tr><td><code>-v ~/.n8n:...</code></td><td>Step 3 မှာ ဆောက်ထားတဲ့ folder ကို container ထဲ mount — data ကျန်မည်</td></tr>
+          <tr><td><code>-e TZ=Asia/Yangon</code></td><td>Myanmar timezone သတ်မှတ် — workflow schedule မှန်ကန်ဖို့</td></tr>
+        </tbody>
+      </table>
+    </div>
+  </div>
+
+  <!-- STEP 5 -->
+  <div class="section-label">
+    <div class="snum">5</div>
+    <div>
+      <div class="stitle">Running ဖြစ်နေကြောင်း စစ်ဆေးပါ</div>
+      <div class="ssub">Container ကောင်းကောင်း start ဖြစ်နေကြောင်း confirm လုပ်ပါ</div>
+    </div>
+  </div>
+
+  <div class="step-block" id="s5">
+    <div class="step-header" onclick="toggle('s5')">
+      <div class="sicon">🔍</div>
+      <div class="sinfo">
+        <div class="sname">Status Check</div>
+        <div class="smeta">docker ps</div>
+      </div>
+      <div class="stoggle">+</div>
+    </div>
+    <div class="sbody">
+      <div class="code-block">
+        <div class="code-header"><span class="clabel">PowerShell / Terminal</span><button class="copy-btn" onclick="copyCode(this)">copy</button></div>
+        <pre><span class="kw">docker</span> ps</pre>
+      </div>
+      <p>Output မှာ STATUS column မှာ <code>Up</code> ပါရမည် —</p>
+      <div class="code-block">
+        <div class="code-header"><span class="clabel">Expected Output</span></div>
+        <pre><span class="ok">CONTAINER ID   IMAGE                    STATUS          PORTS
+abc123def456   docker.n8n.io/n8nio/n8n  Up 30 seconds   0.0.0.0:5678->5678/tcp</span></pre>
+      </div>
+      <div class="alert warn">
+        <span class="ai">⚠️</span>
+        <span>STATUS မှာ <code>Exited</code> ဆိုရင် — <code>docker logs n8n</code> run ပြီး error message စစ်ဆေးပါ</span>
+      </div>
+    </div>
+  </div>
+
+  <!-- STEP 6 -->
+  <div class="section-label">
+    <div class="snum">6</div>
+    <div>
+      <div class="stitle">n8n Account Create</div>
+      <div class="ssub">Browser ဖွင့်ပြီး ပထမဆုံး account ဆောက်ရမည်</div>
+    </div>
+  </div>
+
+  <div class="step-block" id="s6">
+    <div class="step-header" onclick="toggle('s6')">
+      <div class="sicon">🌐</div>
+      <div class="sinfo">
+        <div class="sname">Browser မှာ n8n ဖွင့်ပြီး setup လုပ်ပါ</div>
+        <div class="smeta">localhost:5678</div>
+      </div>
+      <div class="stoggle">+</div>
+    </div>
+    <div class="sbody">
+      <div class="substep">
+        <div class="ssn">1</div>
+        <div class="ssc">
+          <div class="sst">Browser ဖွင့်ပြီး URL ထည့်ပါ</div>
+          <div class="ssd" style="margin-bottom: 8px;">Chrome / Edge / Firefox မည်သည်မဆို — address bar မှာ ဒါ ရိုက်ထည့်ပါ</div>
+          <div class="code-block">
+            <div class="code-header"><span class="clabel">Browser Address Bar</span><button class="copy-btn" onclick="copyCode(this)">copy</button></div>
+            <pre>http://localhost:5678</pre>
+          </div>
+        </div>
+      </div>
+      <div class="substep">
+        <div class="ssn">2</div>
+        <div class="ssc">
+          <div class="sst">Account ဖွင့်ပါ</div>
+          <div class="ssd">Setup form ထွက်လာမည် — First name, Last name, Email, Password ဖြည့်ပြီး <strong>"Get started for free"</strong> နှိပ်ပါ</div>
+        </div>
+      </div>
+      <div class="substep">
+        <div class="ssn">3</div>
+        <div class="ssc">
+          <div class="sst">Dashboard ပေါ်လာမည်</div>
+          <div class="ssd">Survey ထွက်ရင် skip နိုင်တယ် — n8n dashboard ပေါ်လာပြီဆိုရင် install အောင်မြင်ပြီ</div>
+          <div class="alert success" style="margin-top: 8px;">
+            <span class="ai">✅</span>
+            <span>n8n dashboard ပေါ်လာပြီ — workflow တွေ create လုပ်ဖို့ အဆင်သင့်ဖြစ်ပြီ</span>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="divider"></div>
+
+  <!-- DAILY COMMANDS -->
+  <div class="section-label">
+    <div class="snum pre">⚡</div>
+    <div>
+      <div class="stitle">နေ့တိုင်း သုံးမည့် Commands</div>
+      <div class="ssub">Container manage လုပ်ဖို့ cheat sheet</div>
+    </div>
+  </div>
+
+  <div class="step-block" id="s7">
+    <div class="step-header" onclick="toggle('s7')">
+      <div class="sicon">📋</div>
+      <div class="sinfo">
+        <div class="sname">Start · Stop · Update · Delete</div>
+        <div class="smeta">PowerShell / Terminal</div>
+      </div>
+      <div class="stoggle">+</div>
+    </div>
+    <div class="sbody">
+      <div class="code-block">
+        <div class="code-header"><span class="clabel">PowerShell / Terminal</span><button class="copy-btn" onclick="copyCode(this)">copy</button></div>
+        <pre><span class="cm"># n8n ဖွင့်</span>
+<span class="kw">docker</span> start n8n
+
+<span class="cm"># n8n ပိတ်</span>
+<span class="kw">docker</span> stop n8n
+
+<span class="cm"># n8n restart</span>
+<span class="kw">docker</span> restart n8n
+
+<span class="cm"># Log ကြည့် (live)</span>
+<span class="kw">docker</span> logs <span class="fl">-f</span> n8n
+
+<span class="cm"># n8n version update</span>
+<span class="kw">docker</span> stop n8n
+<span class="kw">docker</span> rm n8n
+<span class="kw">docker</span> pull docker.n8n.io/n8nio/n8n
+<span class="cm"># ပြီးရင် Step 4 command ပြန် run ပါ — data ကျန်မည်</span>
+
+<span class="cm"># Container ဖျက် (data ကျန်မည်)</span>
+<span class="kw">docker</span> rm <span class="fl">-f</span> n8n</pre>
+      </div>
+    </div>
+  </div>
+
+  <div class="success-banner">
+    <div class="big-icon">🎉</div>
+    <h2>Setup Complete!</h2>
+    <p>Docker Local n8n install အောင်မြင်ပြီ<br>Browser မှာ အောက်ပါ URL ကနေ n8n ကို access လုပ်နိုင်မည်</p>
+    <a class="url-pill" href="http://localhost:5678" target="_blank">🌐 &nbsp; http://localhost:5678</a>
+  </div>
+
+</div>
+
+<script>
+  function toggle(id) { document.getElementById(id).classList.toggle('open'); }
+
+  function switchOS(btn, tid) {
+    const body = btn.closest('.sbody');
+    body.querySelectorAll('.os-tab').forEach(t => t.classList.remove('active'));
+    body.querySelectorAll('.os-content').forEach(c => c.classList.remove('active'));
+    btn.classList.add('active');
+    const t = document.getElementById(tid);
+    if (t) t.classList.add('active');
+  }
+
+  function copyCode(btn) {
+    const pre = btn.closest('.code-block').querySelector('pre');
+    navigator.clipboard.writeText(pre.innerText).then(() => {
+      btn.textContent = 'copied!'; btn.classList.add('copied');
+      setTimeout(() => { btn.textContent = 'copy'; btn.classList.remove('copied'); }, 2000);
+    });
+  }
+
+  window.addEventListener('scroll', () => {
+    const p = (window.scrollY / (document.documentElement.scrollHeight - window.innerHeight)) * 100;
+    document.getElementById('prog').style.width = p + '%';
+  });
+
+  document.querySelectorAll('.step-block').forEach((b, i) => {
+    setTimeout(() => b.classList.add('open'), i * 60 + 100);
+  });
+</script>
+</body>
+</html>
