@@ -1,9 +1,9 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="my">
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>n8n-MCP Master Guide — Claude Project Instructions</title>
+<title>n8n-MCP မာစတာ လမ်းညွှန် — Claude Project Instructions</title>
 <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@300;400;500;700&family=Syne:wght@400;600;700;800&display=swap" rel="stylesheet">
 <style>
   :root {
@@ -503,13 +503,13 @@
 
 <header>
   <div class="container">
-    <div class="header-badge">Master Reference</div>
+    <div class="header-badge">မာစတာ လမ်းညွှန်</div>
     <h1>
-      <span class="orange">n8n-MCP</span> with Claude<br>
-      <span class="purple">Project Instructions</span> Guide
+      <span class="orange">n8n-MCP</span> နှင့် Claude<br>
+      <span class="purple">Project Instructions</span> လမ်းညွှန်
     </h1>
     <p style="color: var(--muted); font-size: 16px; max-width: 560px; margin-top: 14px;">
-      Setup, master prompts, tools reference, and Claude Project folder instructions — everything to wire n8n-MCP into Claude perfectly.
+      Setup၊ master prompts၊ tools reference နှင့် Claude Project folder instructions — n8n-MCP ကို Claude နဲ့ တပြေးညီချိတ်ဆက်ဖို့ လိုအပ်သမျှ အားလုံး။
     </p>
     <div class="header-meta">
       <div class="meta-pill"><span class="dot" style="background:#ff6b35"></span>1,396 n8n nodes</div>
@@ -521,8 +521,8 @@
 </header>
 
 <nav>
-  <a class="nav-item active" href="#overview">Overview</a>
-  <a class="nav-item" href="#install">Install</a>
+  <a class="nav-item active" href="#overview">နိဒါန်း</a>
+  <a class="nav-item" href="#install">တပ်ဆင်ခြင်း</a>
   <a class="nav-item" href="#config">Config</a>
   <a class="nav-item" href="#master-prompt">Master Prompt</a>
   <a class="nav-item" href="#tools">Tools</a>
@@ -535,52 +535,52 @@
 
   <!-- OVERVIEW -->
   <section id="overview">
-    <div class="section-tag">01 — Overview</div>
-    <h2>What is n8n-MCP?</h2>
-    <p class="section-desc">A Model Context Protocol server that bridges Claude to n8n's automation platform — giving AI deep, structured knowledge of every node, template, and workflow operation.</p>
+    <div class="section-tag">၀၁ — နိဒါန်း</div>
+    <h2>n8n-MCP ဆိုတာ ဘာလဲ?</h2>
+    <p class="section-desc">Claude နှင့် n8n automation platform ကို ချိတ်ဆက်ပေးတဲ့ Model Context Protocol server တစ်ခုဖြစ်ပြီး — node၊ template နှင့် workflow operation တိုင်းကို AI မှ နက်နဲစွာ နားလည်နိုင်အောင် ဖြည့်ဆည်းပေးသည်။</p>
 
     <div class="card-grid">
       <div class="card">
         <div class="card-icon orange">📚</div>
-        <h3>Node Documentation</h3>
-        <p>1,396 nodes (812 core + 584 community) with 99% property coverage, operations, and real-world configuration examples.</p>
+        <h3>Node စာရွက်စာတမ်း</h3>
+        <p>Node ၁,၃၉၆ ခု (core ၈၁၂ + community ၅၈၄) — property coverage ၉၉%၊ operations နှင့် လက်တွေ့ configuration နမူနာများ ပါဝင်သည်။</p>
       </div>
       <div class="card">
         <div class="card-icon purple">🎯</div>
-        <h3>Template Library</h3>
-        <p>2,709 workflow templates with smart search by task, nodes, complexity, and audience. 100% metadata coverage.</p>
+        <h3>Template စာကြည့်တိုက်</h3>
+        <p>Workflow template ၂,၇၀၉ ခု — task၊ node၊ ရှုပ်ထွေးမှုအဆင့် နှင့် ပရိသတ်အလိုက် ဉာဏ်ရည်တုရှာဖွေမှု။ Metadata ၁၀၀% ပြည့်စုံ။</p>
       </div>
       <div class="card">
         <div class="card-icon cyan">✅</div>
-        <h3>Multi-Level Validation</h3>
-        <p>Validate node configs and full workflows before deploy. Catch runtime failures at design time.</p>
+        <h3>အဆင့်ဆင့် စစ်ဆေးခြင်း</h3>
+        <p>Deploy မတင်ခင် node config နှင့် workflow အားလုံးကို စစ်ဆေးသည်။ Design အဆင့်မှာပင် runtime error များကို ဖမ်းမိစေသည်။</p>
       </div>
       <div class="card">
         <div class="card-icon green">⚡</div>
-        <h3>Workflow Management</h3>
-        <p>Create, update, deploy, test, and monitor n8n workflows directly through Claude with API integration.</p>
+        <h3>Workflow စီမံခန့်ခွဲမှု</h3>
+        <p>API integration ဖြင့် Claude မှတဆင့် n8n workflow များကို တိုက်ရိုက် ဖန်တီး၊ ပြင်ဆင်၊ deploy၊ test နှင့် စောင့်ကြည့်နိုင်သည်။</p>
       </div>
     </div>
 
     <div class="alert warn">
       <div class="alert-icon">⚠️</div>
       <div class="alert-content">
-        <strong>Production Safety</strong>
-        NEVER edit production workflows directly with AI. Always copy → test in dev → validate → deploy.
+        <strong>Production ကာကွယ်ရေး</strong>
+        AI ဖြင့် production workflow ကို တိုက်ရိုက် မပြင်ရ။ အမြဲ copy → dev မှာ test → validate → deploy ၏ အစဉ်လိုက်ဆောင်ရွက်ပါ။
       </div>
     </div>
   </section>
 
   <!-- INSTALL -->
   <section id="install">
-    <div class="section-tag">02 — Installation</div>
-    <h2>3 Ways to Install</h2>
-    <p class="section-desc">Choose based on your environment. npx is fastest, Docker is cleanest, hosted service requires zero setup.</p>
+    <div class="section-tag">၀၂ — တပ်ဆင်ခြင်း</div>
+    <h2>တပ်ဆင်ရန် နည်းလမ်း ၃ မျိုး</h2>
+    <p class="section-desc">သင့် environment ပေါ်မူတည်ပြီး ရွေးချယ်ပါ။ npx သည် အမြန်ဆုံး၊ Docker သည် အသပ်ရပ်ဆုံး၊ hosted service သည် setup မလိုသောနည်းလမ်းဖြစ်သည်။</p>
 
-    <h3 style="margin-bottom: 16px;">Option A — Hosted Service (Zero Setup)</h3>
-    <p style="color: var(--muted); font-size: 14px; margin-bottom: 12px;">Sign up at <a href="https://dashboard.n8n-mcp.com" style="color: var(--accent);">dashboard.n8n-mcp.com</a> → get API key → add config. Free tier: 100 tool calls/day.</p>
+    <h3 style="margin-bottom: 16px;">Option A — Hosted Service (Setup မလို)</h3>
+    <p style="color: var(--muted); font-size: 14px; margin-bottom: 12px;">Sign up လုပ်ရန် <a href="https://dashboard.n8n-mcp.com" style="color: var(--accent);">dashboard.n8n-mcp.com</a> → API key ယူပြီး → config ထည့်ပါ။ Free tier: တစ်နေ့ tool call ၁၀၀ ခု။</p>
 
-    <h3 style="margin-bottom: 16px; margin-top: 32px;">Option B — npx (Recommended Local)</h3>
+    <h3 style="margin-bottom: 16px; margin-top: 32px;">Option B — npx (Local အတွက် အကြံပြု)</h3>
     <div class="code-block">
       <div class="code-header">
         <span class="code-label">terminal</span>
@@ -601,16 +601,16 @@
     <div class="alert info" style="margin-top: 24px;">
       <div class="alert-icon">💡</div>
       <div class="alert-content">
-        Docker image is 82% smaller than n8n images — it has zero n8n dependencies, just the pre-built MCP database runtime.
+        Docker image သည် n8n image ထက် 82% သေးငယ်သည် — n8n dependency မပါဘဲ pre-built MCP database runtime သာ ပါဝင်သောကြောင့်ဖြစ်သည်။
       </div>
     </div>
   </section>
 
   <!-- CONFIG -->
   <section id="config">
-    <div class="section-tag">03 — Configuration</div>
-    <h2>Claude Desktop Config</h2>
-    <p class="section-desc">Add to <code>claude_desktop_config.json</code>. Location varies by OS. Restart Claude Desktop after changes.</p>
+    <div class="section-tag">၀၃ — Configuration</div>
+    <h2>Claude Desktop Config ပြင်ဆင်ခြင်း</h2>
+    <p class="section-desc"><code>claude_desktop_config.json</code> ထဲသို့ ထည့်ပါ။ OS အလိုက် တည်နေရာ ကွဲပြားသည်။ ပြင်ဆင်ပြီးနောက် Claude Desktop ကို restart ချပါ။</p>
 
     <div style="display: flex; gap: 10px; flex-wrap: wrap; margin-bottom: 20px;">
       <div class="meta-pill" style="background: rgba(255,255,255,0.04); padding: 6px 12px; border-radius: 6px;">macOS: <code>~/Library/Application Support/Claude/claude_desktop_config.json</code></div>
@@ -619,7 +619,7 @@
       <div class="meta-pill" style="background: rgba(255,255,255,0.04); padding: 6px 12px; border-radius: 6px;">Windows: <code>%APPDATA%\Claude\claude_desktop_config.json</code></div>
     </div>
 
-    <h3>Basic Config (Documentation Tools Only)</h3>
+    <h3>Basic Config (Documentation Tools များသာ)</h3>
     <div class="code-block">
       <div class="code-header">
         <span class="code-label">claude_desktop_config.json — npx</span>
@@ -640,7 +640,7 @@
 }</pre>
     </div>
 
-    <h3 style="margin-top: 28px;">Full Config (With n8n Management Tools)</h3>
+    <h3 style="margin-top: 28px;">Full Config (n8n Management Tools ပါ)</h3>
     <div class="code-block">
       <div class="code-header">
         <span class="code-label">claude_desktop_config.json — full</span>
@@ -690,22 +690,22 @@
     <div class="alert danger" style="margin-top: 20px;">
       <div class="alert-icon">🔴</div>
       <div class="alert-content">
-        <strong>MCP_MODE: "stdio" is REQUIRED</strong>
-        Without it, Claude Desktop shows <code>"Unexpected token..."</code> JSON parse errors. This env var ensures only JSON-RPC messages go to stdout.
+        <strong>MCP_MODE: "stdio" မဖြစ်မနေ လိုအပ်သည်</strong>
+        မထည့်ပါက Claude Desktop မှာ <code>"Unexpected token..."</code> JSON parse error ဖြစ်သည်။ ဤ env var သည် stdout သို့ JSON-RPC message များသာ ပေးပို့ကြောင်း သေချာစေသည်။
       </div>
     </div>
   </section>
 
   <!-- MASTER PROMPT -->
   <section id="master-prompt">
-    <div class="section-tag">04 — Master Prompt</div>
+    <div class="section-tag">၀၄ — Master Prompt</div>
     <h2>Claude Project Instructions</h2>
-    <p class="section-desc">Copy this entire block into your Claude Project's <strong>Project Instructions</strong> panel. This is the official system prompt from the n8n-MCP repo.</p>
+    <p class="section-desc">ဤ block အားလုံးကို Claude Project ၏ <strong>Project Instructions</strong> panel ထဲသို့ ကူးထည့်ပါ။ n8n-MCP repo မှ တရားဝင် system prompt ဖြစ်သည်။</p>
 
     <div class="alert success" style="margin-bottom: 24px;">
       <div class="alert-icon">✅</div>
       <div class="alert-content">
-        <strong>Where to paste:</strong> Claude.ai → Select your Project → Project Settings → Instructions → Paste below
+        <strong>ဘယ်မှာ paste လုပ်မလဲ —</strong> Claude.ai → Project ရွေးပါ → Project Settings → Instructions → အောက်မှာ paste ချပါ
       </div>
     </div>
 
@@ -886,160 +886,160 @@ Note: LangChain nodes use @n8n/n8n-nodes-langchain. prefix, core nodes use n8n-n
 
   <!-- TOOLS -->
   <section id="tools">
-    <div class="section-tag">05 — MCP Tools</div>
-    <h2>All 20 Available Tools</h2>
-    <p class="section-desc">Core tools work with documentation only. Management tools require <code>N8N_API_URL</code> + <code>N8N_API_KEY</code> in config.</p>
+    <div class="section-tag">၀၅ — MCP Tools</div>
+    <h2>သုံးနိုင်သော Tool ၂၀ ခု</h2>
+    <p class="section-desc">Core tools များသည် documentation နှင့်သာ အလုပ်လုပ်သည်။ Management tools များအတွက် config ထဲတွင် <code>N8N_API_URL</code> + <code>N8N_API_KEY</code> ထည့်ရမည်။</p>
 
-    <h3 style="margin-bottom: 16px;">Core Tools (7)</h3>
+    <h3 style="margin-bottom: 16px;">Core Tools (၇ ခု)</h3>
     <div class="tools-grid">
       <div class="tool-item">
         <div class="tool-name">tools_documentation()</div>
-        <div class="tool-desc">Get docs for any MCP tool — START HERE every session</div>
+        <div class="tool-desc">MCP tool မည်သည့်အတွက်မဆို docs ရယူပါ — session တိုင်း ဤနေရာမှ စပါ</div>
       </div>
       <div class="tool-item">
         <div class="tool-name">search_nodes({query, source, includeExamples})</div>
-        <div class="tool-desc">Full-text search across 1,396 nodes. source: core/community/verified/all</div>
+        <div class="tool-desc">Node ၁,၃၉၆ ခုကို full-text ရှာဖွေသည်။ source: core/community/verified/all</div>
       </div>
       <div class="tool-item">
         <div class="tool-name">get_node({nodeType, detail, mode, includeExamples})</div>
-        <div class="tool-desc">Unified node info — minimal/standard/full detail, docs/search_properties modes</div>
+        <div class="tool-desc">Node အချက်အလက် — minimal/standard/full detail၊ docs/search_properties mode များ</div>
       </div>
       <div class="tool-item">
         <div class="tool-name">validate_node({nodeType, config, mode, profile})</div>
-        <div class="tool-desc">Validate configs. mode: minimal (fast) or full with runtime/strict profiles</div>
+        <div class="tool-desc">Config စစ်ဆေးသည်။ mode: minimal (မြန်) သို့မဟုတ် full + runtime/strict profile</div>
       </div>
       <div class="tool-item">
         <div class="tool-name">validate_workflow(workflow)</div>
-        <div class="tool-desc">Full workflow validation — connections, expressions, AI agent checks</div>
+        <div class="tool-desc">Workflow အပြည့်စစ်ဆေး — connections၊ expressions၊ AI agent စစ်ဆေးချက်</div>
       </div>
       <div class="tool-item">
         <div class="tool-name">search_templates({searchMode, query, task, nodeTypes})</div>
-        <div class="tool-desc">2,709 templates — keyword/by_task/by_nodes/by_metadata search modes</div>
+        <div class="tool-desc">Template ၂,၇၀၉ ခု — keyword/by_task/by_nodes/by_metadata ရှာဖွေမှုနည်းလမ်းများ</div>
       </div>
       <div class="tool-item">
         <div class="tool-name">get_template(templateId, {mode})</div>
-        <div class="tool-desc">Get full workflow JSON — nodes_only/structure/full modes</div>
+        <div class="tool-desc">Workflow JSON အပြည့်ရယူ — nodes_only/structure/full mode</div>
       </div>
     </div>
 
-    <h3 style="margin-top: 32px; margin-bottom: 16px;">Management Tools (13) <span class="badge req">API Required</span></h3>
+    <h3 style="margin-top: 32px; margin-bottom: 16px;">Management Tools (၁၃ ခု) <span class="badge req">API လိုအပ်</span></h3>
     <div class="tools-grid">
       <div class="tool-item">
         <div class="tool-name">n8n_create_workflow(workflow)</div>
-        <div class="tool-desc">Deploy new workflow to n8n instance</div>
+        <div class="tool-desc">n8n instance သို့ workflow အသစ် deploy တင်သည်</div>
       </div>
       <div class="tool-item">
         <div class="tool-name">n8n_get_workflow({id, mode})</div>
-        <div class="tool-desc">Get workflow — full/details/structure/minimal modes</div>
+        <div class="tool-desc">Workflow ရယူ — full/details/structure/minimal mode</div>
       </div>
       <div class="tool-item">
         <div class="tool-name">n8n_update_full_workflow({id, workflow})</div>
-        <div class="tool-desc">Replace entire workflow (complete update)</div>
+        <div class="tool-desc">Workflow တစ်ခုလုံး အစားထိုးသည် (complete update)</div>
       </div>
       <div class="tool-item">
         <div class="tool-name">n8n_update_partial_workflow({id, operations})</div>
-        <div class="tool-desc">Batch diff operations — PREFERRED for updates</div>
+        <div class="tool-desc">Batch diff operations — update များအတွက် ဦးစားပေးနည်းလမ်း</div>
       </div>
       <div class="tool-item">
         <div class="tool-name">n8n_list_workflows({active, tags})</div>
-        <div class="tool-desc">List with filtering and pagination</div>
+        <div class="tool-desc">Filter နှင့် pagination ဖြင့် စာရင်းကြည့်သည်</div>
       </div>
       <div class="tool-item">
         <div class="tool-name">n8n_delete_workflow({id})</div>
-        <div class="tool-desc">Permanently delete workflow</div>
+        <div class="tool-desc">Workflow ကို အပြီးအပိုင် ဖျက်သည်</div>
       </div>
       <div class="tool-item">
         <div class="tool-name">n8n_validate_workflow({id})</div>
-        <div class="tool-desc">Validate deployed workflow by ID</div>
+        <div class="tool-desc">Deploy လုပ်ထားသော workflow ကို ID ဖြင့် စစ်ဆေးသည်</div>
       </div>
       <div class="tool-item">
         <div class="tool-name">n8n_autofix_workflow({id})</div>
-        <div class="tool-desc">Auto-fix common workflow errors</div>
+        <div class="tool-desc">ဖြစ်လေ့ဖြစ်ထ workflow error များကို အလိုအလျောက် ပြင်ဆင်သည်</div>
       </div>
       <div class="tool-item">
         <div class="tool-name">n8n_deploy_template({templateId})</div>
-        <div class="tool-desc">Deploy n8n.io template directly to instance</div>
+        <div class="tool-desc">n8n.io template ကို instance သို့ တိုက်ရိုက် deploy တင်သည်</div>
       </div>
       <div class="tool-item">
         <div class="tool-name">n8n_test_workflow({workflowId, data})</div>
-        <div class="tool-desc">Trigger test execution — auto-detects webhook/form/chat</div>
+        <div class="tool-desc">Test execution ဖွင့်သည် — webhook/form/chat အလိုအလျောက် ရှာဖွေသိရှိသည်</div>
       </div>
       <div class="tool-item">
         <div class="tool-name">n8n_executions({action, workflowId})</div>
-        <div class="tool-desc">list/get/delete executions</div>
+        <div class="tool-desc">execution စာရင်းကြည့်/ရယူ/ဖျက်သည်</div>
       </div>
       <div class="tool-item">
         <div class="tool-name">n8n_workflow_versions({id})</div>
-        <div class="tool-desc">Manage version history and rollback</div>
+        <div class="tool-desc">version မှတ်တမ်းနှင့် rollback စီမံခန့်ခွဲသည်</div>
       </div>
       <div class="tool-item">
         <div class="tool-name">n8n_health_check()</div>
-        <div class="tool-desc">Check n8n API connectivity and features</div>
+        <div class="tool-desc">n8n API ချိတ်ဆက်မှုနှင့် feature များ စစ်ဆေးသည်</div>
       </div>
     </div>
   </section>
 
   <!-- WORKFLOW -->
   <section id="workflow">
-    <div class="section-tag">06 — Build Process</div>
-    <h2>The 8-Step Workflow</h2>
-    <p class="section-desc">Follow this exact sequence every time you build a workflow with Claude + n8n-MCP.</p>
+    <div class="section-tag">၀၆ — တည်ဆောက်ခြင်း လုပ်ငန်းစဉ်</div>
+    <h2>အဆင့် ၈ ဆင့် Workflow လုပ်ငန်းစဉ်</h2>
+    <p class="section-desc">Claude + n8n-MCP ဖြင့် workflow တည်ဆောက်တိုင်း ဤ sequence အတိုင်း လိုက်နာပါ။</p>
 
     <div class="steps">
       <div class="step">
         <div class="step-num">01</div>
         <div class="step-content">
-          <h4>Call tools_documentation()</h4>
-          <p>Always start here — gets current best practices and tool signatures. Never skip.</p>
+          <h4>tools_documentation() ခေါ်ဆိုပါ</h4>
+          <p>အမြဲဤနေရာမှ စပါ — လက်ရှိ best practice နှင့် tool signature များ ရယူသည်။ မဘယ်တော့မှ ကျော်မသွားပါနှင့်။</p>
         </div>
       </div>
       <div class="step">
         <div class="step-num">02</div>
         <div class="step-content">
-          <h4>Template Discovery (parallel)</h4>
-          <p>Search 2,709 templates first. Use <code>by_task</code>, <code>by_metadata</code>, <code>by_nodes</code> modes in parallel. Building from scratch only if no suitable template exists.</p>
+          <h4>Template ရှာဖွေခြင်း (parallel)</h4>
+          <p>Template ၂,၇၀၉ ခုကို အရင်ဆုံး ရှာပါ။ <code>by_task</code>၊ <code>by_metadata</code>၊ <code>by_nodes</code> mode တွေကို parallel ဖြင့် သုံးပါ။ သင့်တော်သော template မရှိမှသာ အသစ်ဆောက်ပါ။</p>
         </div>
       </div>
       <div class="step">
         <div class="step-num">03</div>
         <div class="step-content">
-          <h4>Node Discovery (parallel)</h4>
-          <p>If no template: <code>search_nodes({includeExamples: true})</code> for all required nodes simultaneously.</p>
+          <h4>Node ရှာဖွေခြင်း (parallel)</h4>
+          <p>Template မရှိပါက — လိုအပ်သော node အားလုံးကို တပြိုင်နက် <code>search_nodes({includeExamples: true})</code> ဖြင့် ရှာပါ။</p>
         </div>
       </div>
       <div class="step">
         <div class="step-num">04</div>
         <div class="step-content">
-          <h4>Configuration Phase (parallel)</h4>
-          <p>Use <code>get_node({detail: 'standard', includeExamples: true})</code> for each node. Show architecture to user for approval before building.</p>
+          <h4>Configuration အဆင့် (parallel)</h4>
+          <p>Node တစ်ခုချင်းစီအတွက် <code>get_node({detail: 'standard', includeExamples: true})</code> သုံးပါ။ တည်ဆောက်မတိုင်ခင် architecture ကို user ထံ အတည်ပြုချမ်ပါ။</p>
         </div>
       </div>
       <div class="step">
         <div class="step-num">05</div>
         <div class="step-content">
-          <h4>Validation Phase (parallel)</h4>
-          <p><code>validate_node(mode: 'minimal')</code> → <code>validate_node(mode: 'full', profile: 'runtime')</code>. Fix ALL errors before building.</p>
+          <h4>စစ်ဆေးခြင်း အဆင့် (parallel)</h4>
+          <p><code>validate_node(mode: 'minimal')</code> → <code>validate_node(mode: 'full', profile: 'runtime')</code>။ တည်ဆောက်မတိုင်ခင် error အားလုံး ပြင်ပါ။</p>
         </div>
       </div>
       <div class="step">
         <div class="step-num">06</div>
         <div class="step-content">
-          <h4>Build Workflow</h4>
-          <p>Explicitly set ALL parameters — never rely on defaults. Connect nodes, add error handling. Attribute templates: "Based on template by <strong>[author]</strong> (@[username])."</p>
+          <h4>Workflow တည်ဆောက်ခြင်း</h4>
+          <p>Parameter အားလုံးကို တိတိကျကျ သတ်မှတ်ပါ — default ကို အယုံမကြည်ပါနှင့်။ Node များ ချိတ်ဆက်ပြီး error handling ထည့်ပါ။ Template ကြောင်းဖော်ပြပါ — "Based on template by <strong>[author]</strong> (@[username])."</p>
         </div>
       </div>
       <div class="step">
         <div class="step-num">07</div>
         <div class="step-content">
-          <h4>Workflow Validation</h4>
-          <p><code>validate_workflow()</code> → <code>validate_workflow_connections()</code> → <code>validate_workflow_expressions()</code>. Fix ALL before deploy.</p>
+          <h4>Workflow စစ်ဆေးခြင်း</h4>
+          <p><code>validate_workflow()</code> → <code>validate_workflow_connections()</code> → <code>validate_workflow_expressions()</code>။ Deploy မတင်ခင် အားလုံး ပြင်ပါ။</p>
         </div>
       </div>
       <div class="step">
         <div class="step-num">08</div>
         <div class="step-content">
           <h4>Deploy & Monitor (if API configured)</h4>
-          <p><code>n8n_create_workflow()</code> → <code>n8n_validate_workflow({id})</code> → <code>n8n_test_workflow()</code> → monitor with <code>n8n_executions()</code>.</p>
+          <p><code>n8n_create_workflow()</code> → <code>n8n_validate_workflow({id})</code> → <code>n8n_test_workflow()</code> → <code>n8n_executions()</code> ဖြင့် စောင့်ကြည့်ပါ။</p>
         </div>
       </div>
     </div>
@@ -1047,11 +1047,11 @@ Note: LangChain nodes use @n8n/n8n-nodes-langchain. prefix, core nodes use n8n-n
 
   <!-- CRITICAL -->
   <section id="critical">
-    <div class="section-tag">07 — Critical Rules</div>
-    <h2>Must-Know Patterns</h2>
-    <p class="section-desc">These are the most common failure points. Know these before you start.</p>
+    <div class="section-tag">၀၇ — Critical Rules</div>
+    <h2>မသိမဖြစ် Pattern များ</h2>
+    <p class="section-desc">ဤ pattern များသည် အဖြစ်အများဆုံး ပျက်ကွက်တတ်သောနေရာများ ဖြစ်သည်။ မစတင်မီ ကျက်မှတ်ထားပါ။</p>
 
-    <h3>Never Trust Defaults</h3>
+    <h3>Default ကို အယုံမကြည်ပါနှင့်</h3>
     <div class="code-block">
       <div class="code-header">
         <span class="code-label">node config — bad vs good</span>
@@ -1070,7 +1070,7 @@ Note: LangChain nodes use @n8n/n8n-nodes-langchain. prefix, core nodes use n8n-n
 }</pre>
     </div>
 
-    <h3 style="margin-top: 28px;">addConnection — Correct Syntax</h3>
+    <h3 style="margin-top: 28px;">addConnection — မှန်သော Syntax</h3>
     <div class="code-block">
       <div class="code-header">
         <span class="code-label">addConnection operation</span>
@@ -1089,7 +1089,7 @@ Note: LangChain nodes use @n8n/n8n-nodes-langchain. prefix, core nodes use n8n-n
 }</pre>
     </div>
 
-    <h3 style="margin-top: 28px;">IF Node — TRUE/FALSE Branch Routing</h3>
+    <h3 style="margin-top: 28px;">IF Node — TRUE/FALSE Branch ကွဲသွားသောနေရာ</h3>
     <div class="code-block">
       <div class="code-header">
         <span class="code-label">IF node connections</span>
@@ -1120,7 +1120,7 @@ Note: LangChain nodes use @n8n/n8n-nodes-langchain. prefix, core nodes use n8n-n
 })</pre>
     </div>
 
-    <h3 style="margin-top: 28px;">Batch Partial Updates — Always Batch</h3>
+    <h3 style="margin-top: 28px;">Batch Partial Updates — အမြဲ Batch ဖြင့် လုပ်ပါ</h3>
     <div class="code-block">
       <div class="code-header">
         <span class="code-label">batch updates</span>
@@ -1142,44 +1142,44 @@ n8n_update_partial_workflow({
 
   <!-- CLAUDE PROJECT -->
   <section id="project">
-    <div class="section-tag">08 — Claude Project Setup</div>
-    <h2>Claude Project Folder Guide</h2>
-    <p class="section-desc">Best practice structure for your Claude Project when using n8n-MCP.</p>
+    <div class="section-tag">၀၈ — Claude Project Setup</div>
+    <h2>Claude Project Folder လမ်းညွှန်</h2>
+    <p class="section-desc">n8n-MCP သုံးစဉ် Claude Project အတွက် best practice ဖွဲ့စည်းပုံ။</p>
 
     <div class="steps">
       <div class="step">
         <div class="step-num">1</div>
         <div class="step-content">
-          <h4>Create a dedicated Claude Project</h4>
-          <p>Go to Claude.ai → Projects → New Project. Name it "n8n Automation" or similar. Keep all n8n work in one project for persistent context.</p>
+          <h4>Claude Project သီးသန့် ဖန်တီးပါ</h4>
+          <p>Claude.ai → Projects → New Project သို့ သွားပါ။ "n8n Automation" ဟု နာမည်ပေးပါ။ n8n ဆိုင်ရာ အလုပ်အားလုံးကို project တစ်ခုထဲ ထည့်ထားပါ — context ဆက်လက်ရှိနေရန်။</p>
         </div>
       </div>
       <div class="step">
         <div class="step-num">2</div>
         <div class="step-content">
-          <h4>Paste Master Prompt into Project Instructions</h4>
-          <p>Project Settings → Instructions → paste the full system prompt from Section 04. This activates all the core behavior rules for every conversation.</p>
+          <h4>Master Prompt ကို Project Instructions ထဲ paste ချပါ</h4>
+          <p>Project Settings → Instructions → Section 04 မှ system prompt အပြည့်အဝ paste ချပါ။ ဤနည်းဖြင့် conversation တိုင်းအတွက် core behavior rule များ အသက်ဝင်လာမည်။</p>
         </div>
       </div>
       <div class="step">
         <div class="step-num">3</div>
         <div class="step-content">
-          <h4>Add your n8n instance details</h4>
-          <p>Append to Project Instructions: your n8n URL, any custom node prefixes, workflow naming conventions, and Supabase/Google Sheets connection patterns you use.</p>
+          <h4>n8n instance အချက်အလက်များ ထည့်ပါ</h4>
+          <p>Project Instructions ၏ နောက်ဆုံးတွင် ဤတို့ ထပ်ထည့်ပါ — n8n URL၊ custom node prefix များ၊ workflow naming convention နှင့် Supabase/Google Sheets ချိတ်ဆက်မှု pattern များ။</p>
         </div>
       </div>
       <div class="step">
         <div class="step-num">4</div>
         <div class="step-content">
-          <h4>Upload reference files (optional)</h4>
-          <p>You can upload your existing workflow JSON files to the project for Claude to reference patterns, node IDs, and credential names used in your instance.</p>
+          <h4>Reference ဖိုင်များ upload တင်ပါ (ရွေးချယ်နိုင်)</h4>
+          <p>ရှိပြီးသား workflow JSON ဖိုင်များကို project ထဲ upload တင်နိုင်သည် — Claude မှ သင့် instance တွင် သုံးသော pattern၊ node ID နှင့် credential name များကို ကိုးကားနိုင်ရန်။</p>
         </div>
       </div>
       <div class="step">
         <div class="step-num">5</div>
         <div class="step-content">
-          <h4>Append custom context for your stack</h4>
-          <p>e.g. for your setup: Hostinger VPS, n8n v2.14.2, Supabase storage, YouTube API, custom image API at <code>customtexttoimage.riddler9999.workers.dev</code>.</p>
+          <h4>သင့် Stack အတွက် custom context ထပ်ထည့်ပါ</h4>
+          <p>ဥပမာ — သင့် setup: Hostinger VPS၊ n8n v2.14.2၊ Supabase storage၊ YouTube API၊ custom image API (<code>customtexttoimage.riddler9999.workers.dev</code>)။</p>
         </div>
       </div>
     </div>
@@ -1216,7 +1216,7 @@ DNv6pMGG3nZk84B2 — Custom image API test</pre>
 </div>
 
 <footer>
-  Built for <a href="https://github.com/moehtetofficial/n8nmasterclass">moehtetofficial/n8nmasterclass</a> · 
+  တည်ဆောက်ရာ — <a href="https://github.com/moehtetofficial/n8nmasterclass">moehtetofficial/n8nmasterclass</a> · 
   Source: <a href="https://github.com/czlonkowski/n8n-mcp">czlonkowski/n8n-mcp</a> ·
   Claude n8n MCP Master Guide
 </footer>
