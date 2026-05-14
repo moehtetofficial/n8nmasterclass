@@ -118,6 +118,58 @@
   .fade-up:nth-child(3){transition-delay:0.2s;}
 
   @media(max-width:700px){.method-inner{grid-template-columns:1fr;gap:16px;}.method-num{display:none;}.method-cta{align-self:flex-start;}}
+
+  /* MCP STORY */
+  .mcp-story{margin-bottom:64px;}
+  .story-header{margin-bottom:40px;}
+  .story-tag{font-family:'JetBrains Mono',monospace;font-size:10px;letter-spacing:0.2em;text-transform:uppercase;color:var(--muted);margin-bottom:12px;}
+  .story-tag::before{content:'// ';}
+  .story-title{font-family:'Bebas Neue',cursive;font-size:clamp(36px,5vw,56px);line-height:0.95;color:var(--white);letter-spacing:0.02em;margin-bottom:8px;}
+  .story-sub{font-family:'Noto Sans Myanmar',sans-serif;font-size:14px;color:var(--muted);}
+
+  .chars-row{display:flex;align-items:center;gap:12px;margin-bottom:40px;flex-wrap:wrap;}
+  .char-card{background:var(--s1);border:1px solid var(--border);border-radius:12px;padding:16px 20px;text-align:center;min-width:110px;transition:transform 0.2s,border-color 0.2s;}
+  .char-card:hover{transform:translateY(-3px);}
+  .char-card.c1{border-color:rgba(0,229,160,0.3);background:rgba(0,229,160,0.06);}
+  .char-card.c2{border-color:rgba(255,107,53,0.3);background:rgba(255,107,53,0.06);}
+  .char-card.c3{border-color:rgba(123,97,255,0.3);background:rgba(123,97,255,0.06);}
+  .char-emoji{font-size:32px;margin-bottom:8px;}
+  .char-label{font-family:'JetBrains Mono',monospace;font-size:11px;color:var(--muted);margin-bottom:4px;}
+  .char-role{font-family:'Noto Sans Myanmar',sans-serif;font-size:13px;font-weight:700;color:var(--text);}
+  .char-plus{font-family:'Bebas Neue',cursive;font-size:28px;color:var(--muted2);}
+
+  .story-steps{display:flex;flex-direction:column;gap:2px;}
+  .sstep{display:flex;gap:20px;background:var(--s1);border:1px solid var(--border);border-radius:12px;padding:24px 28px;transition:border-color 0.2s;}
+  .sstep:hover{border-color:var(--border2);}
+  .sstep.accent1{border-left:3px solid var(--c1);}
+  .sstep.accent2{border-left:3px solid var(--c2);}
+  .sstep.accent3{border-left:3px solid var(--c3);}
+  .sstep.highlight{background:rgba(255,255,255,0.03);border-color:var(--border2);}
+  .sstep.closing{background:linear-gradient(135deg,rgba(123,97,255,0.05),rgba(0,229,160,0.05));border-color:rgba(123,97,255,0.2);}
+  .sstep-num{font-family:'Bebas Neue',cursive;font-size:32px;color:var(--muted2);min-width:40px;line-height:1;margin-top:2px;}
+  .sstep.accent1 .sstep-num{color:var(--c1);}
+  .sstep.accent2 .sstep-num{color:var(--c2);}
+  .sstep.accent3 .sstep-num{color:var(--c3);}
+  .sstep-body{flex:1;}
+  .sstep-title{font-size:16px;font-weight:700;color:var(--white);margin-bottom:8px;font-family:'Noto Sans Myanmar',sans-serif;}
+  .sstep-desc{font-family:'Noto Sans Myanmar',sans-serif;font-size:14px;color:var(--muted);line-height:1.9;}
+
+  .perm-table{margin-top:16px;display:flex;flex-direction:column;gap:8px;}
+  .perm-row{display:flex;align-items:center;gap:12px;background:var(--s2);border:1px solid var(--border);border-radius:8px;padding:12px 16px;}
+  .perm-icon{font-size:20px;flex-shrink:0;}
+  .perm-info{flex:1;}
+  .perm-name{font-size:13px;font-weight:700;color:var(--text);font-family:'Noto Sans Myanmar',sans-serif;}
+  .perm-desc{font-size:12px;color:var(--muted);font-family:'Noto Sans Myanmar',sans-serif;margin-top:2px;line-height:1.6;}
+  .perm-badge{font-family:'JetBrains Mono',monospace;font-size:10px;letter-spacing:0.1em;text-transform:uppercase;padding:4px 10px;border-radius:20px;flex-shrink:0;}
+  .perm-badge.basic{background:rgba(245,158,11,0.12);color:#fcd34d;border:1px solid rgba(245,158,11,0.3);}
+  .perm-badge.full{background:rgba(0,229,160,0.12);color:#6ee7b7;border:1px solid rgba(0,229,160,0.3);}
+
+  .golden-rule{display:flex;gap:14px;align-items:flex-start;background:rgba(255,255,255,0.04);border:1px solid rgba(255,255,255,0.1);border-radius:10px;padding:16px 20px;margin-top:16px;}
+  .gr-icon{font-size:22px;flex-shrink:0;}
+  .gr-text{font-family:'Noto Sans Myanmar',sans-serif;font-size:14px;color:var(--muted);line-height:1.9;}
+
+  @media(max-width:600px){.chars-row{gap:8px;}.char-card{min-width:80px;padding:12px;}.char-emoji{font-size:24px;}.sstep{padding:16px 18px;}.sstep-num{font-size:24px;min-width:30px;}}
+
 </style>
 </head>
 <body>
@@ -167,17 +219,116 @@
 <section class="section">
   <div class="container">
 
-    <div class="info-box fade-up">
-      <div class="info-box-title">MCP ဆိုတာ ဘာလဲ</div>
-      <div class="info-box-desc">MCP (Model Context Protocol) ဆိုတာ Claude Desktop ကို external tool တွေနဲ့ ချိတ်ဆက်ပေးတဲ့ protocol တစ်ခုဖြစ်သည်။ n8n-MCP ကနေ Claude ကို n8n workflow တွေ create, edit, validate, deploy လုပ်နိုင်အောင် direct access ပေးသည်။ n8n install လုပ်ထားတဲ့ method အပေါ်မူတည်ပြီး config ကွဲသောကြောင့် method အလိုက် သပ်သပ်စီ guide ရှိသည်။</div>
-      <div class="flow-diagram" style="margin-bottom:0;">
-        <div class="flow-box" style="font-size:12px;">n8n install (Docker / npm / VPS)</div>
-        <div class="flow-arrow">+</div>
-        <div class="flow-box" style="font-size:12px;">Claude Desktop</div>
-        <div class="flow-arrow">+</div>
-        <div class="flow-box c3" style="font-size:12px;">MCP config</div>
-        <div class="flow-arrow">→</div>
-        <div class="flow-box c1" style="font-size:12px;">Claude နဲ့ n8n control လုပ်ပါ</div>
+    <!-- MCP EXPLAINER -->
+    <div class="mcp-story fade-up">
+
+      <!-- ANALOGY INTRO -->
+      <div class="story-header">
+        <div class="story-tag">// real talk</div>
+        <div class="story-title">MCP ဆိုတာ ဘာလဲ</div>
+        <div class="story-sub">နည်းပညာစကားမသုံးဘဲ ရှင်းပြမည်</div>
+      </div>
+
+      <!-- CHARACTERS -->
+      <div class="chars-row">
+        <div class="char-card">
+          <div class="char-emoji">🧑‍💼</div>
+          <div class="char-label">သင် (User)</div>
+          <div class="char-role">သူဌေး</div>
+        </div>
+        <div class="char-plus">+</div>
+        <div class="char-card c1">
+          <div class="char-emoji">🤖</div>
+          <div class="char-label">Claude</div>
+          <div class="char-role">လက်တိုလက်တောင်း</div>
+        </div>
+        <div class="char-plus">+</div>
+        <div class="char-card c3">
+          <div class="char-emoji">🔑</div>
+          <div class="char-label">MCP</div>
+          <div class="char-role">ရုံးတံခါး + Password</div>
+        </div>
+        <div class="char-plus">+</div>
+        <div class="char-card c2">
+          <div class="char-emoji">🏢</div>
+          <div class="char-label">n8n</div>
+          <div class="char-role">ရုံး</div>
+        </div>
+      </div>
+
+      <!-- STORY STEPS -->
+      <div class="story-steps">
+
+        <div class="sstep">
+          <div class="sstep-num">01</div>
+          <div class="sstep-body">
+            <div class="sstep-title">သင်ရုံးကို မသွားချင်တဲ့နေ့</div>
+            <div class="sstep-desc">သင် (သူဌေး) က ရုံး (n8n) ကို တိုက်ရိုက်သွားချင်တဲ့အချိန်မှ သွားတယ်။ ဒါပေမယ့် ရုံးကအလုပ်တွေ နေ့တိုင်းပုံမှန်လုပ်နေဖို့ လိုတယ်။ သင်မသွားနိုင်တဲ့နေ့မျိုးမှာ ဘယ်သူက ရုံးကိုသွားမလဲ?</div>
+          </div>
+        </div>
+
+        <div class="sstep accent1">
+          <div class="sstep-num">02</div>
+          <div class="sstep-body">
+            <div class="sstep-title">Claude ကို ခိုင်းလိုက်</div>
+            <div class="sstep-desc">သင့် လက်တိုလက်တောင်း (Claude) ကို "ရုံးကိုသွားပြီး ဒီ workflow တွေ run ပေးပါ" လို့ ခိုင်းလိုက်ရုံပဲ။ Claude က ဘယ်တော့မဆို ၂၄/၇ အလုပ်လုပ်ပေးနိုင်တယ်။</div>
+          </div>
+        </div>
+
+        <div class="sstep accent3">
+          <div class="sstep-num">03</div>
+          <div class="sstep-body">
+            <div class="sstep-title">MCP က တံခါးပေါက်</div>
+            <div class="sstep-desc">ဒါပေမယ့် Claude က ရုံး (n8n) ထဲဝင်ဖို့ Password လိုတယ်။ ထို Password ကို သင်က Claude အတွက် သီးသန့်ထုတ်ပေးထားရတယ် — ဒါပဲ <strong style="color:#c4b5fd;">MCP + API Key</strong>။ Claude က ဒီ password နဲ့ တံခါးဖွင့်ပြီး ရုံးထဲဝင်နိုင်တယ်။</div>
+          </div>
+        </div>
+
+        <div class="sstep accent2">
+          <div class="sstep-num">04</div>
+          <div class="sstep-body">
+            <div class="sstep-title">ခွင့်ပြုချက် (Permission) အဆင့်တွေ</div>
+            <div class="sstep-desc">Claude ကို ရုံးတံခါးအထိပဲ ဝင်ခွင့်ပေးထားသလား — ဒါမှမဟုတ် ကိုယ်ပိုင်ရုံးခန်းထဲအထိ ဝင်ခွင့်ပေးထားသလား ဆိုတာ သင်သတ်မှတ်ရတယ်။</div>
+            <div class="perm-table">
+              <div class="perm-row">
+                <div class="perm-icon">🚪</div>
+                <div class="perm-info">
+                  <div class="perm-name">Basic Access</div>
+                  <div class="perm-desc">workflow ကြည့်၊ search လုပ်၊ execute — ရုံးလုပ်ငန်းများ ကြည့်ရုံ</div>
+                </div>
+                <div class="perm-badge basic">Limited</div>
+              </div>
+              <div class="perm-row">
+                <div class="perm-icon">🏠</div>
+                <div class="perm-info">
+                  <div class="perm-name">Full Access</div>
+                  <div class="perm-desc">workflow create, edit, delete, nodes configure — ရုံးထဲ အကုန်ထိနိုင်</div>
+                </div>
+                <div class="perm-badge full">Full</div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <div class="sstep highlight">
+          <div class="sstep-num">⚡</div>
+          <div class="sstep-body">
+            <div class="sstep-title">အရေးကြီးဆုံး — စနစ်တကျ ခိုင်းတတ်ဖို့</div>
+            <div class="sstep-desc">Claude ကို ခိုင်းလိုက်တာနဲ့ တန်းလုပ်ခိုင်းမနေပဲ <strong style="color:#fff;">Plan ကို အရင်ပြခိုင်း</strong> — သင်က စစ်ဆေးပြီး OK ဆိုမှ လုပ်ခိုင်းပါ။ Plan ကို ၁၀၀% နားလည်စရာမလိုဘူး — ၇၀% နားလည်ပြီး မှန်မမှန် ဆုံးဖြတ်နိုင်ရင် လုံလောက်တယ်။</div>
+            <div class="golden-rule">
+              <div class="gr-icon">💬</div>
+              <div class="gr-text">"ဒါလုပ်ပေးပါ" မဟုတ်ဘဲ<br><strong>"ဒါလုပ်ဖို့ ဘယ်လိုလုပ်မလဲ Plan ပြပါ၊ ပြီးမှ OK ဆိုမှ လုပ်ပါ"</strong></div>
+            </div>
+          </div>
+        </div>
+
+        <div class="sstep closing">
+          <div class="sstep-num">🔮</div>
+          <div class="sstep-body">
+            <div class="sstep-title">အနာဂတ် AI သုံးပုံ</div>
+            <div class="sstep-desc">ဘာမှမဆို အစအဆုံး ကိုယ်တိုင်ဝင်လုပ်ရတဲ့ ခေတ်ကုန်သွားပြီ။ <strong style="color:#fff;">စနစ်တကျ ခိုင်းတတ်ဖို့ပဲ သင်ယူရမှာ</strong> — ခိုင်းတာ လွယ်တယ်၊ စနစ်တကျ ခိုင်းတတ်ဖို့တော့ မလွယ်ဘူး။</div>
+          </div>
+        </div>
+
       </div>
     </div>
 
