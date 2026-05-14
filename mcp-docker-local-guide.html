@@ -1,0 +1,489 @@
+<!DOCTYPE html>
+<html lang="my">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>n8n MCP — Docker Local Setup</title>
+<link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;700&family=Noto+Sans+Myanmar:wght@400;700&family=Syne:wght@400;700;800&display=swap" rel="stylesheet">
+<style>
+  :root{--bg:#0a0a0f;--surface:#111118;--surface2:#1a1a24;--border:#2a2a3a;--accent:#00e5a0;--accent2:#00b37a;--text:#e2e8f0;--muted:#64748b;--code-bg:#0d1117;--green:#10b981;--yellow:#f59e0b;--red:#f87171;}
+  *{margin:0;padding:0;box-sizing:border-box;}
+  body{background:var(--bg);color:var(--text);font-family:'Syne',sans-serif;line-height:1.6;overflow-x:hidden;}
+  body::before{content:'';position:fixed;inset:0;background-image:url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noise'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noise)' opacity='0.04'/%3E%3C/svg%3E");pointer-events:none;z-index:0;opacity:0.4;}
+  .container{max-width:860px;margin:0 auto;padding:0 24px 80px;position:relative;z-index:1;}
+  .progress-bar{position:fixed;top:0;left:0;right:0;height:3px;background:var(--border);z-index:100;}
+  .progress-fill{height:100%;background:linear-gradient(90deg,var(--accent2),var(--accent));width:0%;transition:width 0.1s;}
+  .hero{padding:72px 0 52px;border-bottom:1px solid var(--border);position:relative;}
+  .hero::after{content:'';position:absolute;top:0;left:-100px;right:-100px;height:1px;background:linear-gradient(90deg,transparent,var(--accent2),var(--accent),transparent);}
+  .badge{display:inline-flex;align-items:center;gap:8px;background:rgba(0,229,160,0.1);border:1px solid rgba(0,229,160,0.35);color:#6ee7b7;font-family:'JetBrains Mono',monospace;font-size:11px;letter-spacing:0.15em;text-transform:uppercase;padding:6px 14px;border-radius:4px;margin-bottom:24px;}
+  .badge::before{content:'▸';color:var(--accent);}
+  h1{font-size:clamp(28px,5vw,48px);font-weight:800;line-height:1.1;letter-spacing:-0.02em;margin-bottom:16px;}
+  h1 span.hl{background:linear-gradient(135deg,var(--accent),#00b3ff);-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text;}
+  .hero-desc{font-size:15px;color:var(--muted);font-family:'Noto Sans Myanmar',sans-serif;line-height:1.9;max-width:560px;}
+  .section-label{display:flex;align-items:flex-start;gap:14px;margin:52px 0 20px;}
+  .snum{width:38px;height:38px;border-radius:50%;background:linear-gradient(135deg,var(--accent2),var(--accent));display:flex;align-items:center;justify-content:center;font-family:'JetBrains Mono',monospace;font-size:14px;font-weight:700;flex-shrink:0;margin-top:2px;color:#000;}
+  .snum.pre{background:linear-gradient(135deg,#1e293b,#334155);border:1px solid var(--border);font-size:16px;color:var(--text);}
+  .stitle{font-size:20px;font-weight:800;letter-spacing:-0.01em;}
+  .ssub{font-size:13px;color:var(--muted);font-family:'Noto Sans Myanmar',sans-serif;margin-top:3px;line-height:1.7;}
+  .step-block{background:var(--surface);border:1px solid var(--border);border-radius:12px;margin-bottom:14px;overflow:hidden;}
+  .step-header{padding:16px 22px;display:flex;align-items:center;gap:14px;cursor:pointer;user-select:none;border-bottom:1px solid transparent;transition:border-color 0.2s,background 0.15s;}
+  .step-header:hover{background:rgba(255,255,255,0.02);}
+  .step-block.open .step-header{border-bottom-color:var(--border);}
+  .sicon{font-size:20px;width:30px;text-align:center;flex-shrink:0;}
+  .sinfo{flex:1;}
+  .sname{font-size:15px;font-weight:700;font-family:'Noto Sans Myanmar',sans-serif;}
+  .smeta{font-size:11px;color:var(--muted);font-family:'JetBrains Mono',monospace;margin-top:2px;}
+  .stoggle{font-family:'JetBrains Mono',monospace;font-size:20px;color:var(--muted);transition:transform 0.2s,color 0.2s;line-height:1;}
+  .step-block.open .stoggle{transform:rotate(45deg);color:var(--accent);}
+  .sbody{display:none;padding:22px;}
+  .step-block.open .sbody{display:block;}
+  .os-tabs{display:flex;gap:8px;margin-bottom:14px;flex-wrap:wrap;}
+  .os-tab{padding:6px 14px;border-radius:6px;font-family:'JetBrains Mono',monospace;font-size:12px;cursor:pointer;border:1px solid var(--border);background:transparent;color:var(--muted);transition:all 0.15s;}
+  .os-tab:hover{border-color:var(--accent);color:var(--text);}
+  .os-tab.active{background:rgba(0,229,160,0.12);border-color:var(--accent);color:#6ee7b7;}
+  .os-content{display:none;}.os-content.active{display:block;}
+  .code-block{background:var(--code-bg);border:1px solid var(--border);border-radius:8px;overflow:hidden;margin:10px 0;}
+  .code-header{display:flex;align-items:center;justify-content:space-between;padding:9px 14px;border-bottom:1px solid var(--border);}
+  .clabel{font-family:'JetBrains Mono',monospace;font-size:10px;color:var(--muted);letter-spacing:0.1em;text-transform:uppercase;}
+  .copy-btn{background:none;border:1px solid var(--border);color:var(--muted);font-family:'JetBrains Mono',monospace;font-size:11px;padding:3px 10px;border-radius:4px;cursor:pointer;transition:all 0.15s;}
+  .copy-btn:hover{border-color:var(--accent);color:var(--accent);}
+  .copy-btn.copied{border-color:var(--green);color:var(--green);}
+  pre{padding:16px;overflow-x:auto;font-family:'JetBrains Mono',monospace;font-size:13px;line-height:1.8;}
+  .cm{color:#6e7681;}.kw{color:#79c0ff;}.fl{color:#ffa657;}.st{color:#a5d6ff;}.ok{color:var(--green);}.hl2{color:var(--accent);}
+  code{background:rgba(0,229,160,0.1);color:#6ee7b7;font-family:'JetBrains Mono',monospace;font-size:12px;padding:2px 7px;border-radius:4px;border:1px solid rgba(0,229,160,0.2);}
+  .alert{display:flex;gap:12px;padding:13px 16px;border-radius:8px;margin:12px 0;font-family:'Noto Sans Myanmar',sans-serif;font-size:13px;line-height:1.8;}
+  .alert.warn{background:rgba(245,158,11,0.08);border:1px solid rgba(245,158,11,0.3);color:#fcd34d;}
+  .alert.info{background:rgba(0,229,160,0.07);border:1px solid rgba(0,229,160,0.25);color:#6ee7b7;}
+  .alert.success{background:rgba(16,185,129,0.08);border:1px solid rgba(16,185,129,0.3);color:#6ee7b7;}
+  .alert.danger{background:rgba(248,113,113,0.08);border:1px solid rgba(248,113,113,0.3);color:#fca5a5;}
+  .ai{font-size:15px;flex-shrink:0;margin-top:2px;}
+  .substep{display:flex;gap:14px;padding:14px 0;border-bottom:1px solid var(--border);}
+  .substep:first-child{padding-top:0;}.substep:last-child{border-bottom:none;padding-bottom:0;}
+  .ssn{width:24px;height:24px;border-radius:50%;background:var(--surface2);border:1px solid var(--border);display:flex;align-items:center;justify-content:center;font-family:'JetBrains Mono',monospace;font-size:11px;font-weight:700;color:var(--muted);flex-shrink:0;margin-top:1px;}
+  .ssc{flex:1;}.sst{font-size:14px;font-weight:700;font-family:'Noto Sans Myanmar',sans-serif;margin-bottom:6px;}
+  .ssd{font-family:'Noto Sans Myanmar',sans-serif;font-size:13px;color:var(--muted);line-height:1.8;}
+  .divider{height:1px;background:linear-gradient(90deg,transparent,var(--border),transparent);margin:40px 0;}
+  .plink{display:inline-flex;align-items:center;gap:6px;background:rgba(0,229,160,0.1);border:1px solid rgba(0,229,160,0.3);color:#6ee7b7;font-family:'JetBrains Mono',monospace;font-size:11px;padding:6px 12px;border-radius:6px;text-decoration:none;transition:all 0.15s;margin-top:8px;}
+  .plink:hover{background:rgba(0,229,160,0.2);}
+  .plink::after{content:' ↗';font-size:10px;}
+  .success-banner{margin-top:48px;background:linear-gradient(135deg,rgba(0,229,160,0.07),rgba(0,179,255,0.07));border:1px solid rgba(0,229,160,0.25);border-radius:16px;padding:36px;text-align:center;}
+  .success-banner .big-icon{font-size:44px;margin-bottom:14px;}
+  .success-banner h2{font-size:20px;font-weight:800;margin-bottom:8px;color:#6ee7b7;}
+  .success-banner p{font-family:'Noto Sans Myanmar',sans-serif;font-size:14px;color:var(--muted);margin-bottom:20px;line-height:1.8;}
+  .sbody>p{font-family:'Noto Sans Myanmar',sans-serif;font-size:13px;color:var(--muted);line-height:1.9;margin-bottom:14px;}
+  .sbody>p strong{color:var(--text);}
+  .flow{display:flex;align-items:center;gap:0;margin:16px 0;flex-wrap:wrap;gap:4px;}
+  .flow-box{background:var(--surface2);border:1px solid var(--border);border-radius:8px;padding:8px 14px;font-family:'JetBrains Mono',monospace;font-size:12px;color:var(--text);}
+  .flow-box.accent{background:rgba(0,229,160,0.1);border-color:rgba(0,229,160,0.3);color:#6ee7b7;}
+  .flow-arrow{color:var(--muted);font-size:16px;padding:0 4px;}
+</style>
+</head>
+<body>
+<div class="progress-bar"><div class="progress-fill" id="prog"></div></div>
+<div class="container">
+
+  <section class="hero">
+    <div class="badge">MCP · Docker Local</div>
+    <h1>Claude + n8n <span class="hl">MCP</span><br>Docker Local Guide</h1>
+    <p class="hero-desc">Local Docker မှာ n8n install လုပ်ထားသူများအတွက် — Claude Desktop နဲ့ n8n-MCP ချိတ်ဆက်နည်း အဆင့်ဆင့်</p>
+  </section>
+
+  <!-- WHAT IS MCP -->
+  <div class="section-label">
+    <div class="snum pre">?</div>
+    <div>
+      <div class="stitle">MCP ဆိုတာ ဘာလဲ</div>
+      <div class="ssub">ချိတ်ဆက်မည့် component တွေ ရှင်းလင်းချက်</div>
+    </div>
+  </div>
+
+  <div class="step-block open" id="what">
+    <div class="step-header" onclick="toggle('what')">
+      <div class="sicon">🔗</div>
+      <div class="sinfo">
+        <div class="sname">ဘာချိတ်မလဲ၊ ဘာကြောင့် ချိတ်မလဲ</div>
+        <div class="smeta">MCP — Model Context Protocol</div>
+      </div>
+      <div class="stoggle">+</div>
+    </div>
+    <div class="sbody">
+      <p>MCP (Model Context Protocol) ဆိုတာ Claude Desktop ကို external tool တွေနဲ့ ချိတ်ဆက်ပေးတဲ့ protocol တစ်ခုဖြစ်သည်။ n8n-MCP ကနေ Claude ကို n8n workflow တွေ create, edit, deploy လုပ်နိုင်အောင် direct access ပေးသည်။</p>
+      <div class="flow">
+        <div class="flow-box accent">Claude Desktop</div>
+        <div class="flow-arrow">→</div>
+        <div class="flow-box">n8n-MCP (Docker)</div>
+        <div class="flow-arrow">→</div>
+        <div class="flow-box accent">n8n (localhost:5678)</div>
+      </div>
+      <div class="alert info"><span class="ai">ℹ️</span><span>n8n-MCP က သပ်သပ် Docker container တစ်ခု — n8n container နဲ့ မတူဘဲ Claude ကနေ call လုပ်တိုင်း run ပြီး ပြန်ပိတ်မည် (<code>--rm</code> flag)</span></div>
+    </div>
+  </div>
+
+  <div class="divider"></div>
+
+  <!-- STEP 1 -->
+  <div class="section-label">
+    <div class="snum">1</div>
+    <div>
+      <div class="stitle">Claude Desktop Install</div>
+      <div class="ssub">မရှိသေးရင် download လုပ်ပါ</div>
+    </div>
+  </div>
+
+  <div class="step-block open" id="s1">
+    <div class="step-header" onclick="toggle('s1')">
+      <div class="sicon">🤖</div>
+      <div class="sinfo">
+        <div class="sname">Claude Desktop Download & Install</div>
+        <div class="smeta">claude.ai/download</div>
+      </div>
+      <div class="stoggle">+</div>
+    </div>
+    <div class="sbody">
+      <div class="substep">
+        <div class="ssn">1</div>
+        <div class="ssc">
+          <div class="sst">Download လုပ်ပါ</div>
+          <div class="ssd" style="margin-bottom:8px;">OS အလိုက် ရွေးပြီး download လုပ်ပါ</div>
+          <a class="plink" href="https://claude.ai/download" target="_blank">claude.ai/download</a>
+        </div>
+      </div>
+      <div class="substep">
+        <div class="ssn">2</div>
+        <div class="ssc">
+          <div class="sst">Install + Login လုပ်ပါ</div>
+          <div class="ssd">Anthropic account ဖြင့် login လုပ်ပါ — မရှိသေးရင် claude.ai မှာ free account ဖွင့်နိုင်သည်</div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- STEP 2 -->
+  <div class="section-label">
+    <div class="snum">2</div>
+    <div>
+      <div class="stitle">n8n API Key ထုတ်ယူပါ</div>
+      <div class="ssub">n8n UI မှ API key — MCP ချိတ်ဖို့ လိုအပ်သည်</div>
+    </div>
+  </div>
+
+  <div class="step-block" id="s2">
+    <div class="step-header" onclick="toggle('s2')">
+      <div class="sicon">🔑</div>
+      <div class="sinfo">
+        <div class="sname">n8n API Key Generate</div>
+        <div class="smeta">localhost:5678 → Settings → n8n API</div>
+      </div>
+      <div class="stoggle">+</div>
+    </div>
+    <div class="sbody">
+      <div class="substep">
+        <div class="ssn">1</div>
+        <div class="ssc">
+          <div class="sst">n8n ဖွင့်ပါ</div>
+          <div class="ssd">n8n Docker container running ဖြစ်နေရမည် — Browser မှာ <code>http://localhost:5678</code> ဝင်ပါ</div>
+        </div>
+      </div>
+      <div class="substep">
+        <div class="ssn">2</div>
+        <div class="ssc">
+          <div class="sst">Settings → n8n API → API Key Create</div>
+          <div class="ssd">Bottom-left <strong>Settings</strong> icon → <strong>n8n API</strong> tab → <strong>"Create an API key"</strong> button နှိပ်ပါ</div>
+        </div>
+      </div>
+      <div class="substep">
+        <div class="ssn">3</div>
+        <div class="ssc">
+          <div class="sst">Key ကို copy သိမ်းပါ</div>
+          <div class="ssd">Key ကို ကြည့်ရသည့် အချိန် တစ်ကြိမ်သာ ဖြစ်သည် — notepad မှာ paste ထားပါ</div>
+          <div class="alert warn" style="margin-top:8px;"><span class="ai">⚠️</span><span>Window ပိတ်ပြီးရင် key ကို မမြင်ရတော့ပါ — မသိမ်းမချင်း window မပိတ်ပါနှင့်</span></div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- STEP 3 -->
+  <div class="section-label">
+    <div class="snum">3</div>
+    <div>
+      <div class="stitle">n8n-MCP Docker Image Pull</div>
+      <div class="ssub">MCP image ကို ကြိုတင် download လုပ်ထားပါ</div>
+    </div>
+  </div>
+
+  <div class="step-block" id="s3">
+    <div class="step-header" onclick="toggle('s3')">
+      <div class="sicon">📦</div>
+      <div class="sinfo">
+        <div class="sname">ghcr.io/czlonkowski/n8n-mcp image pull</div>
+        <div class="smeta">PowerShell (Admin) / Terminal</div>
+      </div>
+      <div class="stoggle">+</div>
+    </div>
+    <div class="sbody">
+      <div class="code-block">
+        <div class="code-header"><span class="clabel">PowerShell (Admin) / Terminal</span><button class="copy-btn" onclick="copyCode(this)">copy</button></div>
+        <pre><span class="kw">docker</span> pull ghcr.io/czlonkowski/n8n-mcp:latest</pre>
+      </div>
+      <div class="alert info"><span class="ai">ℹ️</span><span>ဒါမပါဘဲ config ထည့်လည်း Claude ကိုယ်တိုင် pull လုပ်မည် — ကြိုတင် pull လုပ်ထားရင် ပိုမြန်သည်</span></div>
+    </div>
+  </div>
+
+  <!-- STEP 4 -->
+  <div class="section-label">
+    <div class="snum">4</div>
+    <div>
+      <div class="stitle">Claude Desktop Config File ထည့်ပါ</div>
+      <div class="ssub">ဒါကအဓိကဆုံးသော step — config file မှာ MCP server ထည့်ရမည်</div>
+    </div>
+  </div>
+
+  <div class="step-block" id="s4">
+    <div class="step-header" onclick="toggle('s4')">
+      <div class="sicon">⚙️</div>
+      <div class="sinfo">
+        <div class="sname">claude_desktop_config.json တည်းဖြတ်ပါ</div>
+        <div class="smeta">OS အလိုက် path ကွဲသည်</div>
+      </div>
+      <div class="stoggle">+</div>
+    </div>
+    <div class="sbody">
+      <p><strong>Config file ရှာနည်း</strong> — OS အလိုက် ရွေးပါ</p>
+      <div class="os-tabs">
+        <button class="os-tab active" onclick="switchOS(this,'p_win')">🪟 Windows</button>
+        <button class="os-tab" onclick="switchOS(this,'p_mac')">🍎 macOS</button>
+        <button class="os-tab" onclick="switchOS(this,'p_linux')">🐧 Linux</button>
+      </div>
+      <div class="os-content active" id="p_win">
+        <div class="substep" style="padding-top:0;">
+          <div class="ssn">1</div>
+          <div class="ssc">
+            <div class="sst">File Explorer ဖြင့် ဖွင့်ပါ</div>
+            <div class="ssd">File Explorer address bar မှာ ဒါ ရိုက်ပြီး Enter နှိပ်ပါ —</div>
+            <div class="code-block" style="margin-top:8px;">
+              <div class="code-header"><span class="clabel">File Explorer Address Bar</span><button class="copy-btn" onclick="copyCode(this)">copy</button></div>
+              <pre>%APPDATA%\Claude</pre>
+            </div>
+            <div class="ssd" style="margin-top:8px;"><code>claude_desktop_config.json</code> ဆိုတဲ့ file ရှိမရှိ ကြည့်ပါ — မရှိရင် အသစ် create လုပ်ပါ</div>
+          </div>
+        </div>
+        <div class="substep">
+          <div class="ssn">2</div>
+          <div class="ssc">
+            <div class="sst">Notepad ဖြင့် ဖွင့်ပြီး config ထည့်ပါ</div>
+            <div class="ssd" style="margin-bottom:8px;">File ကို right-click → "Open with" → Notepad ဖြင့် ဖွင့်ပါ — အောက်ပါ content ကို ထည့်ပါ</div>
+            <div class="code-block">
+              <div class="code-header"><span class="clabel">claude_desktop_config.json</span><button class="copy-btn" onclick="copyCode(this)">copy</button></div>
+              <pre>{
+  <span class="st">"mcpServers"</span>: {
+    <span class="st">"n8n-mcp"</span>: {
+      <span class="st">"command"</span>: <span class="st">"docker"</span>,
+      <span class="st">"args"</span>: [
+        <span class="st">"run"</span>, <span class="st">"-i"</span>, <span class="st">"--rm"</span>, <span class="st">"--init"</span>,
+        <span class="st">"-e"</span>, <span class="st">"MCP_MODE=stdio"</span>,
+        <span class="st">"-e"</span>, <span class="st">"LOG_LEVEL=error"</span>,
+        <span class="st">"-e"</span>, <span class="st">"DISABLE_CONSOLE_OUTPUT=true"</span>,
+        <span class="st">"-e"</span>, <span class="st">"N8N_API_URL=http://host.docker.internal:5678"</span>,
+        <span class="st">"-e"</span>, <span class="st">"N8N_API_KEY=<span class="hl2">YOUR_API_KEY_HERE</span>"</span>,
+        <span class="st">"-e"</span>, <span class="st">"WEBHOOK_SECURITY_MODE=moderate"</span>,
+        <span class="st">"ghcr.io/czlonkowski/n8n-mcp:latest"</span>
+      ]
+    }
+  }
+}</pre>
+            </div>
+            <div class="alert warn" style="margin-top:8px;"><span class="ai">⚠️</span><span><code>YOUR_API_KEY_HERE</code> ကို Step 2 မှာ copy ထားတဲ့ key နဲ့ အစားထိုးပါ</span></div>
+            <div class="alert danger" style="margin-top:8px;"><span class="ai">🚨</span><span>Local Docker n8n ဆိုတာမို့ <code>host.docker.internal:5678</code> သုံးရမည် — <code>localhost</code> မဟုတ်ပါ</span></div>
+          </div>
+        </div>
+      </div>
+      <div class="os-content" id="p_mac">
+        <div class="substep" style="padding-top:0;">
+          <div class="ssn">1</div>
+          <div class="ssc">
+            <div class="sst">Terminal ကနေ config file ဖွင့်ပါ</div>
+            <div class="code-block" style="margin-top:8px;">
+              <div class="code-header"><span class="clabel">Terminal</span><button class="copy-btn" onclick="copyCode(this)">copy</button></div>
+              <pre><span class="kw">open</span> ~/Library/Application\ Support/Claude/
+<span class="cm"># claude_desktop_config.json ကို TextEdit / VS Code ဖြင့် ဖွင့်ပါ</span></pre>
+            </div>
+          </div>
+        </div>
+        <div class="substep">
+          <div class="ssn">2</div>
+          <div class="ssc">
+            <div class="sst">Config ထည့်ပါ</div>
+            <div class="code-block" style="margin-top:8px;">
+              <div class="code-header"><span class="clabel">claude_desktop_config.json</span><button class="copy-btn" onclick="copyCode(this)">copy</button></div>
+              <pre>{
+  <span class="st">"mcpServers"</span>: {
+    <span class="st">"n8n-mcp"</span>: {
+      <span class="st">"command"</span>: <span class="st">"docker"</span>,
+      <span class="st">"args"</span>: [
+        <span class="st">"run"</span>, <span class="st">"-i"</span>, <span class="st">"--rm"</span>, <span class="st">"--init"</span>,
+        <span class="st">"-e"</span>, <span class="st">"MCP_MODE=stdio"</span>,
+        <span class="st">"-e"</span>, <span class="st">"LOG_LEVEL=error"</span>,
+        <span class="st">"-e"</span>, <span class="st">"DISABLE_CONSOLE_OUTPUT=true"</span>,
+        <span class="st">"-e"</span>, <span class="st">"N8N_API_URL=http://host.docker.internal:5678"</span>,
+        <span class="st">"-e"</span>, <span class="st">"N8N_API_KEY=<span class="hl2">YOUR_API_KEY_HERE</span>"</span>,
+        <span class="st">"-e"</span>, <span class="st">"WEBHOOK_SECURITY_MODE=moderate"</span>,
+        <span class="st">"ghcr.io/czlonkowski/n8n-mcp:latest"</span>
+      ]
+    }
+  }
+}</pre>
+            </div>
+            <div class="alert danger" style="margin-top:8px;"><span class="ai">🚨</span><span>Mac Docker မှာ <code>host.docker.internal</code> သုံးရမည် — <code>localhost</code> မဟုတ်ပါ</span></div>
+          </div>
+        </div>
+      </div>
+      <div class="os-content" id="p_linux">
+        <div class="substep" style="padding-top:0;">
+          <div class="ssn">1</div>
+          <div class="ssc">
+            <div class="sst">Config file ဖွင့်ပါ</div>
+            <div class="code-block" style="margin-top:8px;">
+              <div class="code-header"><span class="clabel">Terminal</span><button class="copy-btn" onclick="copyCode(this)">copy</button></div>
+              <pre><span class="kw">mkdir</span> <span class="fl">-p</span> ~/.config/Claude
+<span class="kw">nano</span> ~/.config/Claude/claude_desktop_config.json</pre>
+            </div>
+          </div>
+        </div>
+        <div class="substep">
+          <div class="ssn">2</div>
+          <div class="ssc">
+            <div class="sst">Config ထည့်ပါ</div>
+            <div class="code-block" style="margin-top:8px;">
+              <div class="code-header"><span class="clabel">claude_desktop_config.json</span><button class="copy-btn" onclick="copyCode(this)">copy</button></div>
+              <pre>{
+  <span class="st">"mcpServers"</span>: {
+    <span class="st">"n8n-mcp"</span>: {
+      <span class="st">"command"</span>: <span class="st">"docker"</span>,
+      <span class="st">"args"</span>: [
+        <span class="st">"run"</span>, <span class="st">"-i"</span>, <span class="st">"--rm"</span>, <span class="st">"--init"</span>,
+        <span class="st">"-e"</span>, <span class="st">"MCP_MODE=stdio"</span>,
+        <span class="st">"-e"</span>, <span class="st">"LOG_LEVEL=error"</span>,
+        <span class="st">"-e"</span>, <span class="st">"DISABLE_CONSOLE_OUTPUT=true"</span>,
+        <span class="st">"-e"</span>, <span class="st">"N8N_API_URL=http://172.17.0.1:5678"</span>,
+        <span class="st">"-e"</span>, <span class="st">"N8N_API_KEY=<span class="hl2">YOUR_API_KEY_HERE</span>"</span>,
+        <span class="st">"-e"</span>, <span class="st">"WEBHOOK_SECURITY_MODE=moderate"</span>,
+        <span class="st">"ghcr.io/czlonkowski/n8n-mcp:latest"</span>
+      ]
+    }
+  }
+}</pre>
+            </div>
+            <div class="alert warn" style="margin-top:8px;"><span class="ai">⚠️</span><span>Linux Docker မှာ <code>host.docker.internal</code> အလုပ်မလုပ်တတ် — <code>172.17.0.1</code> (Docker bridge IP) သုံးရမည်</span></div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- STEP 5 -->
+  <div class="section-label">
+    <div class="snum">5</div>
+    <div>
+      <div class="stitle">Claude Desktop Restart</div>
+      <div class="ssub">config ပြောင်းပြီးတိုင်း restart မှ effect ဖြစ်မည်</div>
+    </div>
+  </div>
+
+  <div class="step-block" id="s5">
+    <div class="step-header" onclick="toggle('s5')">
+      <div class="sicon">🔄</div>
+      <div class="sinfo">
+        <div class="sname">Claude Desktop ကို fully quit ပြီး ပြန်ဖွင့်ပါ</div>
+        <div class="smeta">taskbar မှ quit — window close မဟုတ်</span></div>
+      </div>
+      <div class="stoggle">+</div>
+    </div>
+    <div class="sbody">
+      <div class="substep">
+        <div class="ssn">1</div>
+        <div class="ssc">
+          <div class="sst">Fully Quit လုပ်ပါ</div>
+          <div class="ssd"><strong>Windows:</strong> Taskbar system tray မှာ Claude icon ကို right-click → <strong>Quit</strong><br><strong>Mac:</strong> Dock မှာ Claude ကို right-click → <strong>Quit</strong></div>
+        </div>
+      </div>
+      <div class="substep">
+        <div class="ssn">2</div>
+        <div class="ssc">
+          <div class="sst">Claude Desktop ပြန်ဖွင့်ပါ</div>
+          <div class="ssd">Desktop shortcut ကနေ Claude ကို ပြန်ဖွင့်ပါ</div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- STEP 6 -->
+  <div class="section-label">
+    <div class="snum">6</div>
+    <div>
+      <div class="stitle">MCP ချိတ်ဆက်မှု စစ်ဆေးပါ</div>
+      <div class="ssub">Claude မှာ n8n tools ပေါ်နေရမည်</div>
+    </div>
+  </div>
+
+  <div class="step-block" id="s6">
+    <div class="step-header" onclick="toggle('s6')">
+      <div class="sicon">✅</div>
+      <div class="sinfo">
+        <div class="sname">Connection Test</div>
+        <div class="smeta">Claude chat မှာ test လုပ်ပါ</div>
+      </div>
+      <div class="stoggle">+</div>
+    </div>
+    <div class="sbody">
+      <div class="substep">
+        <div class="ssn">1</div>
+        <div class="ssc">
+          <div class="sst">Tools icon စစ်ဆေးပါ</div>
+          <div class="ssd">Claude Desktop chat window အောက်ခြေမှာ 🔧 tools icon ပေါ်နေရမည် — နှိပ်ကြည့်ရင် <code>n8n-mcp</code> ပါနေရမည်</div>
+        </div>
+      </div>
+      <div class="substep">
+        <div class="ssn">2</div>
+        <div class="ssc">
+          <div class="sst">Claude ကို စမ်းမေးပါ</div>
+          <div class="ssd" style="margin-bottom:8px;">Chat မှာ ဒါ ရိုက်ပါ —</div>
+          <div class="code-block">
+            <div class="code-header"><span class="clabel">Claude Chat</span><button class="copy-btn" onclick="copyCode(this)">copy</button></div>
+            <pre>list my n8n workflows</pre>
+          </div>
+          <div class="ssd" style="margin-top:8px;">n8n မှာ ရှိတဲ့ workflow list ပြမည်ဆိုရင် MCP ချိတ်ဆက်မှု အောင်မြင်ပြီ</div>
+          <div class="alert success" style="margin-top:8px;"><span class="ai">✅</span><span>Workflow list ပေါ်လာပြီ — Claude + n8n MCP setup ပြီးပြည့်စုံပြီ</span></div>
+        </div>
+      </div>
+      <div class="substep">
+        <div class="ssn">3</div>
+        <div class="ssc">
+          <div class="sst">Error ဖြစ်ရင် စစ်ဆေးပါ</div>
+          <div class="ssd">n8n container running ဖြစ်နေကြောင်း စစ်ဆေးပါ —</div>
+          <div class="code-block" style="margin-top:8px;">
+            <div class="code-header"><span class="clabel">PowerShell / Terminal</span><button class="copy-btn" onclick="copyCode(this)">copy</button></div>
+            <pre><span class="kw">docker</span> ps
+<span class="cm"># n8n container STATUS → Up ဖြစ်နေရမည်</span></pre>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="success-banner">
+    <div class="big-icon">🎉</div>
+    <h2>MCP Setup Complete!</h2>
+    <p>Claude Desktop ကနေ n8n workflow တွေကို directly create, edit, deploy လုပ်နိုင်ပြီ</p>
+    <div style="font-family:'JetBrains Mono',monospace;font-size:13px;color:#6ee7b7;background:rgba(0,229,160,0.08);border:1px solid rgba(0,229,160,0.25);border-radius:8px;padding:12px 20px;display:inline-block;margin-top:8px;">"list my n8n workflows" လို့ Claude ကို မေးကြည့်ပါ</div>
+  </div>
+
+</div>
+<script>
+  function toggle(id){document.getElementById(id).classList.toggle('open');}
+  function switchOS(btn,tid){const b=btn.closest('.sbody');b.querySelectorAll('.os-tab').forEach(t=>t.classList.remove('active'));b.querySelectorAll('.os-content').forEach(c=>c.classList.remove('active'));btn.classList.add('active');const t=document.getElementById(tid);if(t)t.classList.add('active');}
+  function copyCode(btn){const pre=btn.closest('.code-block').querySelector('pre');navigator.clipboard.writeText(pre.innerText).then(()=>{btn.textContent='copied!';btn.classList.add('copied');setTimeout(()=>{btn.textContent='copy';btn.classList.remove('copied');},2000);});}
+  window.addEventListener('scroll',()=>{document.getElementById('prog').style.width=(window.scrollY/(document.documentElement.scrollHeight-window.innerHeight))*100+'%';});
+  document.querySelectorAll('.step-block').forEach((b,i)=>setTimeout(()=>b.classList.add('open'),i*60+100));
+</script>
+</body>
+</html>
