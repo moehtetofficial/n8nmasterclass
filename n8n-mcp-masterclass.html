@@ -753,7 +753,7 @@ Note: LangChain nodes use @n8n/n8n-nodes-langchain. prefix, core nodes use n8n-n
         <div class="step-num">5</div>
         <div class="step-content">
           <h4>သင့် Stack အတွက် custom context ထပ်ထည့်ပါ</h4>
-          <p>ဥပမာ — သင့် setup: Hostinger VPS၊ n8n v2.14.2၊ Supabase storage၊ YouTube API၊ custom image API (<code>customtexttoimage.riddler9999.workers.dev</code>)။</p>
+          <p>သင့် n8n URL၊ LLM provider၊ storage service နှင့် active workflow ID များ ထည့်ပါ။</p>
         </div>
       </div>
     </div>
@@ -765,25 +765,16 @@ Note: LangChain nodes use @n8n/n8n-nodes-langchain. prefix, core nodes use n8n-n
       </div>
       <pre><span class="cmt">## My Stack Context (append after master prompt)</span>
 
-<span class="key">n8n Instance</span>: n8n.srv1235044.hstgr.cloud (<span class="val">v2.14.2</span>)
-<span class="key">Storage</span>: Supabase + Google Sheets (mode: list, cachedResultName)
-<span class="key">Image API</span>: customtexttoimage.riddler9999.workers.dev
-<span class="key">Video</span>: Veo 3.1 — 9:16, 8s clips
-<span class="key">TTS</span>: Gemini TTS 3.1
+<span class="key">n8n Instance</span>: https://your-n8n-instance.com
+<span class="key">Storage</span>: your-storage-service
+<span class="key">LLM</span>: your-llm-provider
 
 <span class="key">Known Quirks</span>:
-- JSON.stringify inside ={{ }} fails → use Code node
-- Langchain nodes: create non-langchain via MCP, add langchain manually in UI
-- Google Sheets v4.5: mode:'list' + cachedResultName (not integer GIDs)
-- outputParserStructured v1.3: autoFix must be false
-- HTTP Request on VPS: allowUnauthorizedCerts: true
-- Credentials: never auto-assigned → always set manually in UI
-- Cron: use (0 6 * * *) not hoursInterval
+- သင့် n8n version အတွက် သိထားသော bug/workaround များ ဤနေရာတွင် ထည့်ပါ
 
 <span class="key">Active Workflows</span>:
-ybSTRUujdo2umnE5 — Wordy Tales (motivational storytelling)
-XCqNrGml5Bac7mhq — Myanmar Dhamma upload
-DNv6pMGG3nZk84B2 — Custom image API test</pre>
+workflow-id-1 — workflow အမည်
+workflow-id-2 — workflow အမည်</pre>
     </div>
   </section>
 
