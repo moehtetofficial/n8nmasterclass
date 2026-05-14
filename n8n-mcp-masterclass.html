@@ -1,0 +1,1289 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>n8n-MCP Master Guide — Claude Project Instructions</title>
+<link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@300;400;500;700&family=Syne:wght@400;600;700;800&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --bg: #0a0a0f;
+    --surface: #111118;
+    --surface2: #16161f;
+    --border: #1e1e2e;
+    --accent: #ff6b35;
+    --accent2: #7c3aed;
+    --accent3: #06b6d4;
+    --green: #22c55e;
+    --red: #ef4444;
+    --yellow: #f59e0b;
+    --text: #e2e8f0;
+    --muted: #64748b;
+    --code-bg: #0d0d15;
+  }
+
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+
+  body {
+    background: var(--bg);
+    color: var(--text);
+    font-family: 'Syne', sans-serif;
+    line-height: 1.6;
+    overflow-x: hidden;
+  }
+
+  /* Animated grid background */
+  body::before {
+    content: '';
+    position: fixed;
+    inset: 0;
+    background-image:
+      linear-gradient(rgba(255,107,53,0.03) 1px, transparent 1px),
+      linear-gradient(90deg, rgba(255,107,53,0.03) 1px, transparent 1px);
+    background-size: 60px 60px;
+    pointer-events: none;
+    z-index: 0;
+  }
+
+  /* Header */
+  header {
+    position: relative;
+    padding: 60px 40px 50px;
+    border-bottom: 1px solid var(--border);
+    background: linear-gradient(180deg, rgba(124,58,237,0.08) 0%, transparent 100%);
+    overflow: hidden;
+    z-index: 1;
+  }
+
+  header::after {
+    content: 'n8n × MCP';
+    position: absolute;
+    right: -20px;
+    top: -10px;
+    font-size: 160px;
+    font-weight: 800;
+    color: rgba(255,107,53,0.03);
+    white-space: nowrap;
+    pointer-events: none;
+    letter-spacing: -8px;
+  }
+
+  .header-badge {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    background: rgba(255,107,53,0.1);
+    border: 1px solid rgba(255,107,53,0.3);
+    color: var(--accent);
+    padding: 4px 14px;
+    border-radius: 20px;
+    font-size: 11px;
+    font-family: 'JetBrains Mono', monospace;
+    font-weight: 700;
+    letter-spacing: 2px;
+    text-transform: uppercase;
+    margin-bottom: 20px;
+  }
+
+  .header-badge::before {
+    content: '';
+    width: 6px; height: 6px;
+    background: var(--accent);
+    border-radius: 50%;
+    animation: pulse 2s infinite;
+  }
+
+  @keyframes pulse {
+    0%, 100% { opacity: 1; transform: scale(1); }
+    50% { opacity: 0.5; transform: scale(0.8); }
+  }
+
+  h1 {
+    font-size: clamp(28px, 5vw, 52px);
+    font-weight: 800;
+    line-height: 1.1;
+    letter-spacing: -1px;
+    margin-bottom: 16px;
+  }
+
+  h1 span.orange { color: var(--accent); }
+  h1 span.purple { color: #a78bfa; }
+
+  .header-meta {
+    display: flex;
+    gap: 24px;
+    flex-wrap: wrap;
+    margin-top: 20px;
+  }
+
+  .meta-pill {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 12px;
+    color: var(--muted);
+  }
+
+  .meta-pill .dot {
+    width: 8px; height: 8px;
+    border-radius: 2px;
+  }
+
+  /* Nav */
+  nav {
+    position: sticky;
+    top: 0;
+    z-index: 100;
+    background: rgba(10,10,15,0.95);
+    backdrop-filter: blur(12px);
+    border-bottom: 1px solid var(--border);
+    padding: 0 40px;
+    display: flex;
+    gap: 0;
+    overflow-x: auto;
+    scrollbar-width: none;
+  }
+
+  nav::-webkit-scrollbar { display: none; }
+
+  .nav-item {
+    padding: 14px 18px;
+    font-size: 12px;
+    font-weight: 600;
+    font-family: 'JetBrains Mono', monospace;
+    color: var(--muted);
+    text-decoration: none;
+    border-bottom: 2px solid transparent;
+    white-space: nowrap;
+    transition: all 0.2s;
+    letter-spacing: 0.5px;
+  }
+
+  .nav-item:hover { color: var(--text); border-color: var(--accent); }
+  .nav-item.active { color: var(--accent); border-color: var(--accent); }
+
+  /* Main layout */
+  .container {
+    max-width: 1100px;
+    margin: 0 auto;
+    padding: 0 40px;
+    position: relative;
+    z-index: 1;
+  }
+
+  section {
+    padding: 60px 0;
+    border-bottom: 1px solid var(--border);
+  }
+
+  section:last-child { border-bottom: none; }
+
+  .section-tag {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 10px;
+    font-weight: 700;
+    letter-spacing: 3px;
+    text-transform: uppercase;
+    color: var(--accent);
+    margin-bottom: 12px;
+  }
+
+  h2 {
+    font-size: 28px;
+    font-weight: 800;
+    letter-spacing: -0.5px;
+    margin-bottom: 8px;
+  }
+
+  h3 {
+    font-size: 17px;
+    font-weight: 700;
+    margin-bottom: 12px;
+    color: var(--text);
+  }
+
+  .section-desc {
+    color: var(--muted);
+    font-size: 15px;
+    margin-bottom: 36px;
+    max-width: 600px;
+  }
+
+  /* Cards */
+  .card-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+    gap: 16px;
+    margin-bottom: 24px;
+  }
+
+  .card {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 12px;
+    padding: 24px;
+    position: relative;
+    transition: border-color 0.2s, transform 0.2s;
+  }
+
+  .card:hover {
+    border-color: rgba(255,107,53,0.3);
+    transform: translateY(-2px);
+  }
+
+  .card-icon {
+    width: 40px; height: 40px;
+    border-radius: 10px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 18px;
+    margin-bottom: 16px;
+  }
+
+  .card-icon.orange { background: rgba(255,107,53,0.12); }
+  .card-icon.purple { background: rgba(124,58,237,0.12); }
+  .card-icon.cyan { background: rgba(6,182,212,0.12); }
+  .card-icon.green { background: rgba(34,197,94,0.12); }
+  .card-icon.yellow { background: rgba(245,158,11,0.12); }
+
+  .card p { font-size: 14px; color: var(--muted); line-height: 1.6; }
+
+  /* Code blocks */
+  .code-block {
+    background: var(--code-bg);
+    border: 1px solid var(--border);
+    border-radius: 10px;
+    overflow: hidden;
+    margin: 16px 0;
+    position: relative;
+  }
+
+  .code-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 10px 16px;
+    background: rgba(255,255,255,0.02);
+    border-bottom: 1px solid var(--border);
+  }
+
+  .code-label {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 11px;
+    font-weight: 500;
+    color: var(--muted);
+    letter-spacing: 1px;
+  }
+
+  .copy-btn {
+    background: rgba(255,107,53,0.1);
+    border: 1px solid rgba(255,107,53,0.3);
+    color: var(--accent);
+    padding: 4px 12px;
+    border-radius: 6px;
+    font-size: 11px;
+    font-family: 'JetBrains Mono', monospace;
+    cursor: pointer;
+    transition: all 0.2s;
+  }
+
+  .copy-btn:hover { background: rgba(255,107,53,0.2); }
+  .copy-btn.copied { color: var(--green); border-color: rgba(34,197,94,0.3); background: rgba(34,197,94,0.1); }
+
+  pre {
+    padding: 20px;
+    overflow-x: auto;
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 13px;
+    line-height: 1.7;
+    color: #c9d1d9;
+  }
+
+  .kw { color: #ff79c6; }
+  .str { color: #f1fa8c; }
+  .cmt { color: #6272a4; font-style: italic; }
+  .val { color: #bd93f9; }
+  .key { color: #50fa7b; }
+  .num { color: #ffb86c; }
+  .acc { color: var(--accent); font-weight: 600; }
+
+  /* Steps */
+  .steps {
+    display: flex;
+    flex-direction: column;
+    gap: 0;
+  }
+
+  .step {
+    display: flex;
+    gap: 20px;
+    padding: 24px 0;
+    border-bottom: 1px solid rgba(255,255,255,0.05);
+    position: relative;
+  }
+
+  .step:last-child { border-bottom: none; }
+
+  .step-num {
+    width: 36px; height: 36px;
+    background: rgba(255,107,53,0.1);
+    border: 1px solid rgba(255,107,53,0.3);
+    border-radius: 8px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 13px;
+    font-weight: 700;
+    color: var(--accent);
+    flex-shrink: 0;
+    margin-top: 2px;
+  }
+
+  .step-content { flex: 1; }
+  .step-content h4 { font-size: 15px; font-weight: 700; margin-bottom: 6px; }
+  .step-content p { font-size: 14px; color: var(--muted); }
+
+  /* Warning / info boxes */
+  .alert {
+    padding: 16px 20px;
+    border-radius: 10px;
+    margin: 16px 0;
+    display: flex;
+    gap: 12px;
+    align-items: flex-start;
+  }
+
+  .alert-icon { font-size: 16px; flex-shrink: 0; margin-top: 2px; }
+  .alert-content { font-size: 14px; }
+  .alert-content strong { display: block; margin-bottom: 4px; }
+
+  .alert.warn {
+    background: rgba(245,158,11,0.06);
+    border: 1px solid rgba(245,158,11,0.2);
+    color: #fcd34d;
+  }
+
+  .alert.danger {
+    background: rgba(239,68,68,0.06);
+    border: 1px solid rgba(239,68,68,0.2);
+    color: #fca5a5;
+  }
+
+  .alert.info {
+    background: rgba(6,182,212,0.06);
+    border: 1px solid rgba(6,182,212,0.2);
+    color: #67e8f9;
+  }
+
+  .alert.success {
+    background: rgba(34,197,94,0.06);
+    border: 1px solid rgba(34,197,94,0.2);
+    color: #86efac;
+  }
+
+  /* Tools table */
+  .tools-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 12px;
+  }
+
+  @media (max-width: 700px) {
+    .tools-grid { grid-template-columns: 1fr; }
+    .card-grid { grid-template-columns: 1fr; }
+    header { padding: 40px 20px; }
+    .container { padding: 0 20px; }
+    nav { padding: 0 20px; }
+  }
+
+  .tool-item {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    padding: 14px 16px;
+    transition: border-color 0.2s;
+  }
+
+  .tool-item:hover { border-color: rgba(124,58,237,0.4); }
+
+  .tool-name {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 12px;
+    font-weight: 700;
+    color: #a78bfa;
+    margin-bottom: 4px;
+  }
+
+  .tool-desc {
+    font-size: 12px;
+    color: var(--muted);
+  }
+
+  /* Master prompt block */
+  .master-prompt {
+    background: var(--code-bg);
+    border: 1px solid rgba(255,107,53,0.3);
+    border-radius: 12px;
+    overflow: hidden;
+  }
+
+  .master-prompt-header {
+    padding: 14px 20px;
+    background: rgba(255,107,53,0.08);
+    border-bottom: 1px solid rgba(255,107,53,0.2);
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+  }
+
+  .master-prompt-header .label {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 12px;
+    font-weight: 700;
+    color: var(--accent);
+    letter-spacing: 1px;
+  }
+
+  .master-prompt pre {
+    max-height: 500px;
+    overflow-y: auto;
+    scrollbar-width: thin;
+    scrollbar-color: var(--border) transparent;
+  }
+
+  .master-prompt pre::-webkit-scrollbar { width: 6px; }
+  .master-prompt pre::-webkit-scrollbar-track { background: transparent; }
+  .master-prompt pre::-webkit-scrollbar-thumb { background: var(--border); border-radius: 3px; }
+
+  /* Badges */
+  .badge {
+    display: inline-flex;
+    align-items: center;
+    padding: 2px 8px;
+    border-radius: 4px;
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 10px;
+    font-weight: 700;
+    letter-spacing: 0.5px;
+    text-transform: uppercase;
+    margin-left: 8px;
+  }
+
+  .badge.new { background: rgba(34,197,94,0.15); color: #86efac; }
+  .badge.req { background: rgba(239,68,68,0.15); color: #fca5a5; }
+  .badge.opt { background: rgba(100,116,139,0.15); color: var(--muted); }
+
+  /* Footer */
+  footer {
+    padding: 40px;
+    text-align: center;
+    color: var(--muted);
+    font-size: 13px;
+    border-top: 1px solid var(--border);
+    font-family: 'JetBrains Mono', monospace;
+  }
+
+  footer a { color: var(--accent); text-decoration: none; }
+
+  /* Inline code */
+  code {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 12px;
+    background: rgba(255,255,255,0.06);
+    padding: 2px 6px;
+    border-radius: 4px;
+    color: #a78bfa;
+  }
+</style>
+</head>
+<body>
+
+<header>
+  <div class="container">
+    <div class="header-badge">Master Reference</div>
+    <h1>
+      <span class="orange">n8n-MCP</span> with Claude<br>
+      <span class="purple">Project Instructions</span> Guide
+    </h1>
+    <p style="color: var(--muted); font-size: 16px; max-width: 560px; margin-top: 14px;">
+      Setup, master prompts, tools reference, and Claude Project folder instructions — everything to wire n8n-MCP into Claude perfectly.
+    </p>
+    <div class="header-meta">
+      <div class="meta-pill"><span class="dot" style="background:#ff6b35"></span>1,396 n8n nodes</div>
+      <div class="meta-pill"><span class="dot" style="background:#7c3aed"></span>2,709 templates</div>
+      <div class="meta-pill"><span class="dot" style="background:#06b6d4"></span>20 MCP tools</div>
+      <div class="meta-pill"><span class="dot" style="background:#22c55e"></span>czlonkowski/n8n-mcp</div>
+    </div>
+  </div>
+</header>
+
+<nav>
+  <a class="nav-item active" href="#overview">Overview</a>
+  <a class="nav-item" href="#install">Install</a>
+  <a class="nav-item" href="#config">Config</a>
+  <a class="nav-item" href="#master-prompt">Master Prompt</a>
+  <a class="nav-item" href="#tools">Tools</a>
+  <a class="nav-item" href="#workflow">Workflow</a>
+  <a class="nav-item" href="#critical">Critical Rules</a>
+  <a class="nav-item" href="#project">Claude Project</a>
+</nav>
+
+<div class="container">
+
+  <!-- OVERVIEW -->
+  <section id="overview">
+    <div class="section-tag">01 — Overview</div>
+    <h2>What is n8n-MCP?</h2>
+    <p class="section-desc">A Model Context Protocol server that bridges Claude to n8n's automation platform — giving AI deep, structured knowledge of every node, template, and workflow operation.</p>
+
+    <div class="card-grid">
+      <div class="card">
+        <div class="card-icon orange">📚</div>
+        <h3>Node Documentation</h3>
+        <p>1,396 nodes (812 core + 584 community) with 99% property coverage, operations, and real-world configuration examples.</p>
+      </div>
+      <div class="card">
+        <div class="card-icon purple">🎯</div>
+        <h3>Template Library</h3>
+        <p>2,709 workflow templates with smart search by task, nodes, complexity, and audience. 100% metadata coverage.</p>
+      </div>
+      <div class="card">
+        <div class="card-icon cyan">✅</div>
+        <h3>Multi-Level Validation</h3>
+        <p>Validate node configs and full workflows before deploy. Catch runtime failures at design time.</p>
+      </div>
+      <div class="card">
+        <div class="card-icon green">⚡</div>
+        <h3>Workflow Management</h3>
+        <p>Create, update, deploy, test, and monitor n8n workflows directly through Claude with API integration.</p>
+      </div>
+    </div>
+
+    <div class="alert warn">
+      <div class="alert-icon">⚠️</div>
+      <div class="alert-content">
+        <strong>Production Safety</strong>
+        NEVER edit production workflows directly with AI. Always copy → test in dev → validate → deploy.
+      </div>
+    </div>
+  </section>
+
+  <!-- INSTALL -->
+  <section id="install">
+    <div class="section-tag">02 — Installation</div>
+    <h2>3 Ways to Install</h2>
+    <p class="section-desc">Choose based on your environment. npx is fastest, Docker is cleanest, hosted service requires zero setup.</p>
+
+    <h3 style="margin-bottom: 16px;">Option A — Hosted Service (Zero Setup)</h3>
+    <p style="color: var(--muted); font-size: 14px; margin-bottom: 12px;">Sign up at <a href="https://dashboard.n8n-mcp.com" style="color: var(--accent);">dashboard.n8n-mcp.com</a> → get API key → add config. Free tier: 100 tool calls/day.</p>
+
+    <h3 style="margin-bottom: 16px; margin-top: 32px;">Option B — npx (Recommended Local)</h3>
+    <div class="code-block">
+      <div class="code-header">
+        <span class="code-label">terminal</span>
+        <button class="copy-btn" onclick="copyCode(this)">copy</button>
+      </div>
+      <pre>npx n8n-mcp</pre>
+    </div>
+
+    <h3 style="margin-bottom: 16px; margin-top: 32px;">Option C — Docker</h3>
+    <div class="code-block">
+      <div class="code-header">
+        <span class="code-label">terminal</span>
+        <button class="copy-btn" onclick="copyCode(this)">copy</button>
+      </div>
+      <pre>docker pull ghcr.io/czlonkowski/n8n-mcp:latest</pre>
+    </div>
+
+    <div class="alert info" style="margin-top: 24px;">
+      <div class="alert-icon">💡</div>
+      <div class="alert-content">
+        Docker image is 82% smaller than n8n images — it has zero n8n dependencies, just the pre-built MCP database runtime.
+      </div>
+    </div>
+  </section>
+
+  <!-- CONFIG -->
+  <section id="config">
+    <div class="section-tag">03 — Configuration</div>
+    <h2>Claude Desktop Config</h2>
+    <p class="section-desc">Add to <code>claude_desktop_config.json</code>. Location varies by OS. Restart Claude Desktop after changes.</p>
+
+    <div style="display: flex; gap: 10px; flex-wrap: wrap; margin-bottom: 20px;">
+      <div class="meta-pill" style="background: rgba(255,255,255,0.04); padding: 6px 12px; border-radius: 6px;">macOS: <code>~/Library/Application Support/Claude/claude_desktop_config.json</code></div>
+    </div>
+    <div style="display: flex; gap: 10px; flex-wrap: wrap; margin-bottom: 24px;">
+      <div class="meta-pill" style="background: rgba(255,255,255,0.04); padding: 6px 12px; border-radius: 6px;">Windows: <code>%APPDATA%\Claude\claude_desktop_config.json</code></div>
+    </div>
+
+    <h3>Basic Config (Documentation Tools Only)</h3>
+    <div class="code-block">
+      <div class="code-header">
+        <span class="code-label">claude_desktop_config.json — npx</span>
+        <button class="copy-btn" onclick="copyCode(this)">copy</button>
+      </div>
+      <pre>{
+  <span class="key">"mcpServers"</span>: {
+    <span class="key">"n8n-mcp"</span>: {
+      <span class="key">"command"</span>: <span class="str">"npx"</span>,
+      <span class="key">"args"</span>: [<span class="str">"n8n-mcp"</span>],
+      <span class="key">"env"</span>: {
+        <span class="key">"MCP_MODE"</span>: <span class="str">"stdio"</span>,         <span class="cmt">// REQUIRED — prevents JSON parse errors</span>
+        <span class="key">"LOG_LEVEL"</span>: <span class="str">"error"</span>,
+        <span class="key">"DISABLE_CONSOLE_OUTPUT"</span>: <span class="str">"true"</span>
+      }
+    }
+  }
+}</pre>
+    </div>
+
+    <h3 style="margin-top: 28px;">Full Config (With n8n Management Tools)</h3>
+    <div class="code-block">
+      <div class="code-header">
+        <span class="code-label">claude_desktop_config.json — full</span>
+        <button class="copy-btn" onclick="copyCode(this)">copy</button>
+      </div>
+      <pre>{
+  <span class="key">"mcpServers"</span>: {
+    <span class="key">"n8n-mcp"</span>: {
+      <span class="key">"command"</span>: <span class="str">"npx"</span>,
+      <span class="key">"args"</span>: [<span class="str">"n8n-mcp"</span>],
+      <span class="key">"env"</span>: {
+        <span class="key">"MCP_MODE"</span>: <span class="str">"stdio"</span>,
+        <span class="key">"LOG_LEVEL"</span>: <span class="str">"error"</span>,
+        <span class="key">"DISABLE_CONSOLE_OUTPUT"</span>: <span class="str">"true"</span>,
+        <span class="key">"N8N_API_URL"</span>: <span class="str">"https://your-n8n-instance.com"</span>,
+        <span class="key">"N8N_API_KEY"</span>: <span class="str">"your-api-key"</span>
+      }
+    }
+  }
+}</pre>
+    </div>
+
+    <h3 style="margin-top: 28px;">Docker Config (Full)</h3>
+    <div class="code-block">
+      <div class="code-header">
+        <span class="code-label">claude_desktop_config.json — docker</span>
+        <button class="copy-btn" onclick="copyCode(this)">copy</button>
+      </div>
+      <pre>{
+  <span class="key">"mcpServers"</span>: {
+    <span class="key">"n8n-mcp"</span>: {
+      <span class="key">"command"</span>: <span class="str">"docker"</span>,
+      <span class="key">"args"</span>: [
+        <span class="str">"run"</span>, <span class="str">"-i"</span>, <span class="str">"--rm"</span>, <span class="str">"--init"</span>,
+        <span class="str">"-e"</span>, <span class="str">"MCP_MODE=stdio"</span>,
+        <span class="str">"-e"</span>, <span class="str">"LOG_LEVEL=error"</span>,
+        <span class="str">"-e"</span>, <span class="str">"DISABLE_CONSOLE_OUTPUT=true"</span>,
+        <span class="str">"-e"</span>, <span class="str">"N8N_API_URL=https://your-n8n.com"</span>,
+        <span class="str">"-e"</span>, <span class="str">"N8N_API_KEY=your-api-key"</span>,
+        <span class="str">"ghcr.io/czlonkowski/n8n-mcp:latest"</span>
+      ]
+    }
+  }
+}</pre>
+    </div>
+
+    <div class="alert danger" style="margin-top: 20px;">
+      <div class="alert-icon">🔴</div>
+      <div class="alert-content">
+        <strong>MCP_MODE: "stdio" is REQUIRED</strong>
+        Without it, Claude Desktop shows <code>"Unexpected token..."</code> JSON parse errors. This env var ensures only JSON-RPC messages go to stdout.
+      </div>
+    </div>
+  </section>
+
+  <!-- MASTER PROMPT -->
+  <section id="master-prompt">
+    <div class="section-tag">04 — Master Prompt</div>
+    <h2>Claude Project Instructions</h2>
+    <p class="section-desc">Copy this entire block into your Claude Project's <strong>Project Instructions</strong> panel. This is the official system prompt from the n8n-MCP repo.</p>
+
+    <div class="alert success" style="margin-bottom: 24px;">
+      <div class="alert-icon">✅</div>
+      <div class="alert-content">
+        <strong>Where to paste:</strong> Claude.ai → Select your Project → Project Settings → Instructions → Paste below
+      </div>
+    </div>
+
+    <div class="master-prompt">
+      <div class="master-prompt-header">
+        <span class="label">CLAUDE PROJECT INSTRUCTIONS — PASTE THIS</span>
+        <button class="copy-btn" id="masterCopyBtn" onclick="copyMasterPrompt(this)">📋 copy all</button>
+      </div>
+      <pre id="masterPromptText">You are an expert in n8n automation software using n8n-MCP tools. Your role is to design, build, and validate n8n workflows with maximum accuracy and efficiency.
+
+## Core Principles
+
+### 1. Silent Execution
+CRITICAL: Execute tools without commentary. Only respond AFTER all tools complete.
+
+❌ BAD: "Let me search for Slack nodes... Great! Now let me get details..."
+✅ GOOD: [Execute search_nodes and get_node in parallel, then respond]
+
+### 2. Parallel Execution
+When operations are independent, execute them in parallel for maximum performance.
+
+✅ GOOD: Call search_nodes, list_nodes, and search_templates simultaneously
+❌ BAD: Sequential tool calls (await each one before the next)
+
+### 3. Templates First
+ALWAYS check templates before building from scratch (2,709 available).
+
+### 4. Multi-Level Validation
+Use validate_node(mode='minimal') → validate_node(mode='full') → validate_workflow pattern.
+
+### 5. Never Trust Defaults
+⚠️ CRITICAL: Default parameter values are the #1 source of runtime failures.
+ALWAYS explicitly configure ALL parameters that control node behavior.
+
+## Workflow Process
+
+1. **Start**: Call `tools_documentation()` for best practices
+
+2. **Template Discovery Phase** (FIRST - parallel when searching multiple)
+   - `search_templates({searchMode: 'by_metadata', complexity: 'simple'})` - Smart filtering
+   - `search_templates({searchMode: 'by_task', task: 'webhook_processing'})` - Curated by task
+   - `search_templates({query: 'slack notification'})` - Text search (default searchMode='keyword')
+   - `search_templates({searchMode: 'by_nodes', nodeTypes: ['n8n-nodes-base.slack']})` - By node type
+
+   **Filtering strategies**:
+   - Beginners: `complexity: "simple"` + `maxSetupMinutes: 30`
+   - By role: `targetAudience: "marketers"` | `"developers"` | `"analysts"`
+   - By time: `maxSetupMinutes: 15` for quick wins
+   - By service: `requiredService: "openai"` for compatibility
+
+3. **Node Discovery** (if no suitable template - parallel execution)
+   - Think deeply about requirements. Ask clarifying questions if unclear.
+   - `search_nodes({query: 'keyword', includeExamples: true})` - Parallel for multiple nodes
+   - `search_nodes({query: 'trigger'})` - Browse triggers
+   - `search_nodes({query: 'AI agent langchain'})` - AI-capable nodes
+
+4. **Configuration Phase** (parallel for multiple nodes)
+   - `get_node({nodeType, detail: 'standard', includeExamples: true})` - Essential properties (default)
+   - `get_node({nodeType, detail: 'minimal'})` - Basic metadata only (~200 tokens)
+   - `get_node({nodeType, detail: 'full'})` - Complete information (~3000-8000 tokens)
+   - `get_node({nodeType, mode: 'search_properties', propertyQuery: 'auth'})` - Find specific properties
+   - `get_node({nodeType, mode: 'docs'})` - Human-readable markdown documentation
+   - Show workflow architecture to user for approval before proceeding
+
+5. **Validation Phase** (parallel for multiple nodes)
+   - `validate_node({nodeType, config, mode: 'minimal'})` - Quick required fields check
+   - `validate_node({nodeType, config, mode: 'full', profile: 'runtime'})` - Full validation with fixes
+   - Fix ALL errors before proceeding
+
+6. **Building Phase**
+   - If using template: `get_template(templateId, {mode: "full"})`
+   - **MANDATORY ATTRIBUTION**: "Based on template by **[author.name]** (@[username]). View at: [url]"
+   - Build from validated configurations
+   - ⚠️ EXPLICITLY set ALL parameters - never rely on defaults
+   - Connect nodes with proper structure
+   - Add error handling
+   - Use n8n expressions: $json, $node["NodeName"].json
+   - Build in artifact (unless deploying to n8n instance)
+
+7. **Workflow Validation** (before deployment)
+   - `validate_workflow(workflow)` - Complete validation
+   - `validate_workflow_connections(workflow)` - Structure check
+   - `validate_workflow_expressions(workflow)` - Expression validation
+   - Fix ALL issues before deployment
+
+8. **Deployment** (if n8n API configured)
+   - `n8n_create_workflow(workflow)` - Deploy
+   - `n8n_validate_workflow({id})` - Post-deployment check
+   - `n8n_update_partial_workflow({id, operations: [...]})` - Batch updates
+   - `n8n_test_workflow({workflowId})` - Test workflow execution
+
+## Critical Warnings
+
+### ⚠️ Never Trust Defaults
+Default values cause runtime failures. Example:
+// ❌ FAILS at runtime
+{resource: "message", operation: "post", text: "Hello"}
+
+// ✅ WORKS - all parameters explicit
+{resource: "message", operation: "post", select: "channel", channelId: "C123", text: "Hello"}
+
+### ⚠️ addConnection Syntax — CRITICAL
+The addConnection operation requires FOUR separate string parameters:
+
+// ✅ CORRECT
+{
+  "type": "addConnection",
+  "source": "node-id-string",
+  "target": "target-node-id-string",
+  "sourcePort": "main",
+  "targetPort": "main"
+}
+
+### ⚠️ IF Node Multi-Output Routing
+IF nodes have two outputs (TRUE and FALSE). Use the branch parameter:
+
+// TRUE branch
+{"type": "addConnection", "source": "if-node-id", "target": "success-id", "sourcePort": "main", "targetPort": "main", "branch": "true"}
+
+// FALSE branch
+{"type": "addConnection", "source": "if-node-id", "target": "failure-id", "sourcePort": "main", "targetPort": "main", "branch": "false"}
+
+## Batch Operations
+Use n8n_update_partial_workflow with multiple operations in ONE call:
+
+n8n_update_partial_workflow({
+  id: "wf-123",
+  operations: [
+    {type: "updateNode", nodeId: "slack-1", changes: {...}},
+    {type: "updateNode", nodeId: "http-1", changes: {...}},
+    {type: "cleanStaleConnections"}
+  ]
+})
+
+## Response Format
+
+### Initial Creation
+[Silent tool execution in parallel]
+
+Created workflow:
+- Webhook trigger → Slack notification
+- Configured: POST /webhook → #general channel
+
+Validation: ✅ All checks passed
+
+### Modifications
+[Silent tool execution]
+
+Updated workflow:
+- Added error handling to HTTP node
+- Fixed required Slack parameters
+
+## Top 20 n8n Nodes Reference
+1. n8n-nodes-base.code — JavaScript/Python scripting
+2. n8n-nodes-base.httpRequest — HTTP API calls
+3. n8n-nodes-base.webhook — Event-driven triggers
+4. n8n-nodes-base.set — Data transformation
+5. n8n-nodes-base.if — Conditional routing
+6. n8n-nodes-base.manualTrigger — Manual execution
+7. n8n-nodes-base.respondToWebhook — Webhook responses
+8. n8n-nodes-base.scheduleTrigger — Time-based triggers
+9. @n8n/n8n-nodes-langchain.agent — AI agents
+10. n8n-nodes-base.googleSheets — Spreadsheet integration
+11. n8n-nodes-base.merge — Data merging
+12. n8n-nodes-base.switch — Multi-branch routing
+13. n8n-nodes-base.telegram — Telegram bot
+14. @n8n/n8n-nodes-langchain.lmChatOpenAi — OpenAI chat
+15. n8n-nodes-base.splitInBatches — Batch processing
+16. n8n-nodes-base.openAi — OpenAI legacy
+17. n8n-nodes-base.gmail — Email automation
+18. n8n-nodes-base.function — Custom functions
+19. n8n-nodes-base.stickyNote — Workflow documentation
+20. n8n-nodes-base.executeWorkflowTrigger — Sub-workflow calls
+
+Note: LangChain nodes use @n8n/n8n-nodes-langchain. prefix, core nodes use n8n-nodes-base.</pre>
+    </div>
+  </section>
+
+  <!-- TOOLS -->
+  <section id="tools">
+    <div class="section-tag">05 — MCP Tools</div>
+    <h2>All 20 Available Tools</h2>
+    <p class="section-desc">Core tools work with documentation only. Management tools require <code>N8N_API_URL</code> + <code>N8N_API_KEY</code> in config.</p>
+
+    <h3 style="margin-bottom: 16px;">Core Tools (7)</h3>
+    <div class="tools-grid">
+      <div class="tool-item">
+        <div class="tool-name">tools_documentation()</div>
+        <div class="tool-desc">Get docs for any MCP tool — START HERE every session</div>
+      </div>
+      <div class="tool-item">
+        <div class="tool-name">search_nodes({query, source, includeExamples})</div>
+        <div class="tool-desc">Full-text search across 1,396 nodes. source: core/community/verified/all</div>
+      </div>
+      <div class="tool-item">
+        <div class="tool-name">get_node({nodeType, detail, mode, includeExamples})</div>
+        <div class="tool-desc">Unified node info — minimal/standard/full detail, docs/search_properties modes</div>
+      </div>
+      <div class="tool-item">
+        <div class="tool-name">validate_node({nodeType, config, mode, profile})</div>
+        <div class="tool-desc">Validate configs. mode: minimal (fast) or full with runtime/strict profiles</div>
+      </div>
+      <div class="tool-item">
+        <div class="tool-name">validate_workflow(workflow)</div>
+        <div class="tool-desc">Full workflow validation — connections, expressions, AI agent checks</div>
+      </div>
+      <div class="tool-item">
+        <div class="tool-name">search_templates({searchMode, query, task, nodeTypes})</div>
+        <div class="tool-desc">2,709 templates — keyword/by_task/by_nodes/by_metadata search modes</div>
+      </div>
+      <div class="tool-item">
+        <div class="tool-name">get_template(templateId, {mode})</div>
+        <div class="tool-desc">Get full workflow JSON — nodes_only/structure/full modes</div>
+      </div>
+    </div>
+
+    <h3 style="margin-top: 32px; margin-bottom: 16px;">Management Tools (13) <span class="badge req">API Required</span></h3>
+    <div class="tools-grid">
+      <div class="tool-item">
+        <div class="tool-name">n8n_create_workflow(workflow)</div>
+        <div class="tool-desc">Deploy new workflow to n8n instance</div>
+      </div>
+      <div class="tool-item">
+        <div class="tool-name">n8n_get_workflow({id, mode})</div>
+        <div class="tool-desc">Get workflow — full/details/structure/minimal modes</div>
+      </div>
+      <div class="tool-item">
+        <div class="tool-name">n8n_update_full_workflow({id, workflow})</div>
+        <div class="tool-desc">Replace entire workflow (complete update)</div>
+      </div>
+      <div class="tool-item">
+        <div class="tool-name">n8n_update_partial_workflow({id, operations})</div>
+        <div class="tool-desc">Batch diff operations — PREFERRED for updates</div>
+      </div>
+      <div class="tool-item">
+        <div class="tool-name">n8n_list_workflows({active, tags})</div>
+        <div class="tool-desc">List with filtering and pagination</div>
+      </div>
+      <div class="tool-item">
+        <div class="tool-name">n8n_delete_workflow({id})</div>
+        <div class="tool-desc">Permanently delete workflow</div>
+      </div>
+      <div class="tool-item">
+        <div class="tool-name">n8n_validate_workflow({id})</div>
+        <div class="tool-desc">Validate deployed workflow by ID</div>
+      </div>
+      <div class="tool-item">
+        <div class="tool-name">n8n_autofix_workflow({id})</div>
+        <div class="tool-desc">Auto-fix common workflow errors</div>
+      </div>
+      <div class="tool-item">
+        <div class="tool-name">n8n_deploy_template({templateId})</div>
+        <div class="tool-desc">Deploy n8n.io template directly to instance</div>
+      </div>
+      <div class="tool-item">
+        <div class="tool-name">n8n_test_workflow({workflowId, data})</div>
+        <div class="tool-desc">Trigger test execution — auto-detects webhook/form/chat</div>
+      </div>
+      <div class="tool-item">
+        <div class="tool-name">n8n_executions({action, workflowId})</div>
+        <div class="tool-desc">list/get/delete executions</div>
+      </div>
+      <div class="tool-item">
+        <div class="tool-name">n8n_workflow_versions({id})</div>
+        <div class="tool-desc">Manage version history and rollback</div>
+      </div>
+      <div class="tool-item">
+        <div class="tool-name">n8n_health_check()</div>
+        <div class="tool-desc">Check n8n API connectivity and features</div>
+      </div>
+    </div>
+  </section>
+
+  <!-- WORKFLOW -->
+  <section id="workflow">
+    <div class="section-tag">06 — Build Process</div>
+    <h2>The 8-Step Workflow</h2>
+    <p class="section-desc">Follow this exact sequence every time you build a workflow with Claude + n8n-MCP.</p>
+
+    <div class="steps">
+      <div class="step">
+        <div class="step-num">01</div>
+        <div class="step-content">
+          <h4>Call tools_documentation()</h4>
+          <p>Always start here — gets current best practices and tool signatures. Never skip.</p>
+        </div>
+      </div>
+      <div class="step">
+        <div class="step-num">02</div>
+        <div class="step-content">
+          <h4>Template Discovery (parallel)</h4>
+          <p>Search 2,709 templates first. Use <code>by_task</code>, <code>by_metadata</code>, <code>by_nodes</code> modes in parallel. Building from scratch only if no suitable template exists.</p>
+        </div>
+      </div>
+      <div class="step">
+        <div class="step-num">03</div>
+        <div class="step-content">
+          <h4>Node Discovery (parallel)</h4>
+          <p>If no template: <code>search_nodes({includeExamples: true})</code> for all required nodes simultaneously.</p>
+        </div>
+      </div>
+      <div class="step">
+        <div class="step-num">04</div>
+        <div class="step-content">
+          <h4>Configuration Phase (parallel)</h4>
+          <p>Use <code>get_node({detail: 'standard', includeExamples: true})</code> for each node. Show architecture to user for approval before building.</p>
+        </div>
+      </div>
+      <div class="step">
+        <div class="step-num">05</div>
+        <div class="step-content">
+          <h4>Validation Phase (parallel)</h4>
+          <p><code>validate_node(mode: 'minimal')</code> → <code>validate_node(mode: 'full', profile: 'runtime')</code>. Fix ALL errors before building.</p>
+        </div>
+      </div>
+      <div class="step">
+        <div class="step-num">06</div>
+        <div class="step-content">
+          <h4>Build Workflow</h4>
+          <p>Explicitly set ALL parameters — never rely on defaults. Connect nodes, add error handling. Attribute templates: "Based on template by <strong>[author]</strong> (@[username])."</p>
+        </div>
+      </div>
+      <div class="step">
+        <div class="step-num">07</div>
+        <div class="step-content">
+          <h4>Workflow Validation</h4>
+          <p><code>validate_workflow()</code> → <code>validate_workflow_connections()</code> → <code>validate_workflow_expressions()</code>. Fix ALL before deploy.</p>
+        </div>
+      </div>
+      <div class="step">
+        <div class="step-num">08</div>
+        <div class="step-content">
+          <h4>Deploy & Monitor (if API configured)</h4>
+          <p><code>n8n_create_workflow()</code> → <code>n8n_validate_workflow({id})</code> → <code>n8n_test_workflow()</code> → monitor with <code>n8n_executions()</code>.</p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- CRITICAL -->
+  <section id="critical">
+    <div class="section-tag">07 — Critical Rules</div>
+    <h2>Must-Know Patterns</h2>
+    <p class="section-desc">These are the most common failure points. Know these before you start.</p>
+
+    <h3>Never Trust Defaults</h3>
+    <div class="code-block">
+      <div class="code-header">
+        <span class="code-label">node config — bad vs good</span>
+        <button class="copy-btn" onclick="copyCode(this)">copy</button>
+      </div>
+      <pre><span class="cmt">// ❌ FAILS at runtime — missing required params</span>
+{<span class="key">resource</span>: <span class="str">"message"</span>, <span class="key">operation</span>: <span class="str">"post"</span>, <span class="key">text</span>: <span class="str">"Hello"</span>}
+
+<span class="cmt">// ✅ WORKS — ALL params explicitly set</span>
+{
+  <span class="key">resource</span>: <span class="str">"message"</span>,
+  <span class="key">operation</span>: <span class="str">"post"</span>,
+  <span class="key">select</span>: <span class="str">"channel"</span>,
+  <span class="key">channelId</span>: <span class="str">"C123456"</span>,
+  <span class="key">text</span>: <span class="str">"Hello"</span>
+}</pre>
+    </div>
+
+    <h3 style="margin-top: 28px;">addConnection — Correct Syntax</h3>
+    <div class="code-block">
+      <div class="code-header">
+        <span class="code-label">addConnection operation</span>
+        <button class="copy-btn" onclick="copyCode(this)">copy</button>
+      </div>
+      <pre><span class="cmt">// ❌ WRONG — object format fails</span>
+{<span class="key">"type"</span>: <span class="str">"addConnection"</span>, <span class="key">"connection"</span>: {<span class="key">"source"</span>: {...}}}
+
+<span class="cmt">// ✅ CORRECT — four separate string params</span>
+{
+  <span class="key">"type"</span>: <span class="str">"addConnection"</span>,
+  <span class="key">"source"</span>: <span class="str">"source-node-id"</span>,
+  <span class="key">"target"</span>: <span class="str">"target-node-id"</span>,
+  <span class="key">"sourcePort"</span>: <span class="str">"main"</span>,
+  <span class="key">"targetPort"</span>: <span class="str">"main"</span>
+}</pre>
+    </div>
+
+    <h3 style="margin-top: 28px;">IF Node — TRUE/FALSE Branch Routing</h3>
+    <div class="code-block">
+      <div class="code-header">
+        <span class="code-label">IF node connections</span>
+        <button class="copy-btn" onclick="copyCode(this)">copy</button>
+      </div>
+      <pre>n8n_update_partial_workflow({
+  <span class="key">id</span>: <span class="str">"workflow-id"</span>,
+  <span class="key">operations</span>: [
+    <span class="cmt">// TRUE branch (condition met)</span>
+    {
+      <span class="key">type</span>: <span class="str">"addConnection"</span>,
+      <span class="key">source</span>: <span class="str">"if-node-id"</span>,
+      <span class="key">target</span>: <span class="str">"success-handler-id"</span>,
+      <span class="key">sourcePort</span>: <span class="str">"main"</span>,
+      <span class="key">targetPort</span>: <span class="str">"main"</span>,
+      <span class="key">branch</span>: <span class="str">"true"</span>   <span class="cmt">// REQUIRED for IF nodes</span>
+    },
+    <span class="cmt">// FALSE branch (condition not met)</span>
+    {
+      <span class="key">type</span>: <span class="str">"addConnection"</span>,
+      <span class="key">source</span>: <span class="str">"if-node-id"</span>,
+      <span class="key">target</span>: <span class="str">"failure-handler-id"</span>,
+      <span class="key">sourcePort</span>: <span class="str">"main"</span>,
+      <span class="key">targetPort</span>: <span class="str">"main"</span>,
+      <span class="key">branch</span>: <span class="str">"false"</span>  <span class="cmt">// REQUIRED for IF nodes</span>
+    }
+  ]
+})</pre>
+    </div>
+
+    <h3 style="margin-top: 28px;">Batch Partial Updates — Always Batch</h3>
+    <div class="code-block">
+      <div class="code-header">
+        <span class="code-label">batch updates</span>
+        <button class="copy-btn" onclick="copyCode(this)">copy</button>
+      </div>
+      <pre><span class="cmt">// ✅ GOOD — ONE call, multiple operations</span>
+n8n_update_partial_workflow({
+  <span class="key">id</span>: <span class="str">"wf-123"</span>,
+  <span class="key">operations</span>: [
+    {<span class="key">type</span>: <span class="str">"updateNode"</span>, <span class="key">nodeId</span>: <span class="str">"slack-1"</span>, <span class="key">changes</span>: {...}},
+    {<span class="key">type</span>: <span class="str">"updateNode"</span>, <span class="key">nodeId</span>: <span class="str">"http-1"</span>, <span class="key">changes</span>: {...}},
+    {<span class="key">type</span>: <span class="str">"cleanStaleConnections"</span>}
+  ]
+})
+
+<span class="cmt">// ❌ BAD — separate calls waste tokens and time</span></pre>
+    </div>
+  </section>
+
+  <!-- CLAUDE PROJECT -->
+  <section id="project">
+    <div class="section-tag">08 — Claude Project Setup</div>
+    <h2>Claude Project Folder Guide</h2>
+    <p class="section-desc">Best practice structure for your Claude Project when using n8n-MCP.</p>
+
+    <div class="steps">
+      <div class="step">
+        <div class="step-num">1</div>
+        <div class="step-content">
+          <h4>Create a dedicated Claude Project</h4>
+          <p>Go to Claude.ai → Projects → New Project. Name it "n8n Automation" or similar. Keep all n8n work in one project for persistent context.</p>
+        </div>
+      </div>
+      <div class="step">
+        <div class="step-num">2</div>
+        <div class="step-content">
+          <h4>Paste Master Prompt into Project Instructions</h4>
+          <p>Project Settings → Instructions → paste the full system prompt from Section 04. This activates all the core behavior rules for every conversation.</p>
+        </div>
+      </div>
+      <div class="step">
+        <div class="step-num">3</div>
+        <div class="step-content">
+          <h4>Add your n8n instance details</h4>
+          <p>Append to Project Instructions: your n8n URL, any custom node prefixes, workflow naming conventions, and Supabase/Google Sheets connection patterns you use.</p>
+        </div>
+      </div>
+      <div class="step">
+        <div class="step-num">4</div>
+        <div class="step-content">
+          <h4>Upload reference files (optional)</h4>
+          <p>You can upload your existing workflow JSON files to the project for Claude to reference patterns, node IDs, and credential names used in your instance.</p>
+        </div>
+      </div>
+      <div class="step">
+        <div class="step-num">5</div>
+        <div class="step-content">
+          <h4>Append custom context for your stack</h4>
+          <p>e.g. for your setup: Hostinger VPS, n8n v2.14.2, Supabase storage, YouTube API, custom image API at <code>customtexttoimage.riddler9999.workers.dev</code>.</p>
+        </div>
+      </div>
+    </div>
+
+    <div class="code-block" style="margin-top: 32px;">
+      <div class="code-header">
+        <span class="code-label">example — custom context to append</span>
+        <button class="copy-btn" onclick="copyCode(this)">copy</button>
+      </div>
+      <pre><span class="cmt">## My Stack Context (append after master prompt)</span>
+
+<span class="key">n8n Instance</span>: n8n.srv1235044.hstgr.cloud (<span class="val">v2.14.2</span>)
+<span class="key">Storage</span>: Supabase + Google Sheets (mode: list, cachedResultName)
+<span class="key">Image API</span>: customtexttoimage.riddler9999.workers.dev
+<span class="key">Video</span>: Veo 3.1 — 9:16, 8s clips
+<span class="key">TTS</span>: Gemini TTS 3.1
+
+<span class="key">Known Quirks</span>:
+- JSON.stringify inside ={{ }} fails → use Code node
+- Langchain nodes: create non-langchain via MCP, add langchain manually in UI
+- Google Sheets v4.5: mode:'list' + cachedResultName (not integer GIDs)
+- outputParserStructured v1.3: autoFix must be false
+- HTTP Request on VPS: allowUnauthorizedCerts: true
+- Credentials: never auto-assigned → always set manually in UI
+- Cron: use (0 6 * * *) not hoursInterval
+
+<span class="key">Active Workflows</span>:
+ybSTRUujdo2umnE5 — Wordy Tales (motivational storytelling)
+XCqNrGml5Bac7mhq — Myanmar Dhamma upload
+DNv6pMGG3nZk84B2 — Custom image API test</pre>
+    </div>
+  </section>
+
+</div>
+
+<footer>
+  Built for <a href="https://github.com/moehtetofficial/n8nmasterclass">moehtetofficial/n8nmasterclass</a> · 
+  Source: <a href="https://github.com/czlonkowski/n8n-mcp">czlonkowski/n8n-mcp</a> ·
+  Claude n8n MCP Master Guide
+</footer>
+
+<script>
+  // Smooth scroll
+  document.querySelectorAll('a[href^="#"]').forEach(a => {
+    a.addEventListener('click', e => {
+      e.preventDefault();
+      document.querySelector(a.getAttribute('href'))?.scrollIntoView({ behavior: 'smooth' });
+    });
+  });
+
+  // Active nav on scroll
+  const sections = document.querySelectorAll('section[id]');
+  const navItems = document.querySelectorAll('.nav-item');
+
+  const observer = new IntersectionObserver(entries => {
+    entries.forEach(entry => {
+      if (entry.isIntersecting) {
+        navItems.forEach(n => n.classList.remove('active'));
+        const active = document.querySelector(`.nav-item[href="#${entry.target.id}"]`);
+        if (active) active.classList.add('active');
+      }
+    });
+  }, { threshold: 0.3 });
+
+  sections.forEach(s => observer.observe(s));
+
+  // Copy code
+  function copyCode(btn) {
+    const pre = btn.closest('.code-block').querySelector('pre');
+    navigator.clipboard.writeText(pre.innerText.trim());
+    btn.textContent = '✓ copied';
+    btn.classList.add('copied');
+    setTimeout(() => { btn.textContent = 'copy'; btn.classList.remove('copied'); }, 2000);
+  }
+
+  // Copy master prompt
+  function copyMasterPrompt(btn) {
+    const text = document.getElementById('masterPromptText').innerText;
+    navigator.clipboard.writeText(text);
+    btn.textContent = '✓ copied!';
+    btn.classList.add('copied');
+    setTimeout(() => { btn.textContent = '📋 copy all'; btn.classList.remove('copied'); }, 3000);
+  }
+
+  // Entrance animation
+  const cards = document.querySelectorAll('.card, .tool-item, .step');
+  const cardObserver = new IntersectionObserver(entries => {
+    entries.forEach((entry, i) => {
+      if (entry.isIntersecting) {
+        setTimeout(() => {
+          entry.target.style.opacity = '1';
+          entry.target.style.transform = 'translateY(0)';
+        }, i * 30);
+        cardObserver.unobserve(entry.target);
+      }
+    });
+  }, { threshold: 0.1 });
+
+  cards.forEach(c => {
+    c.style.opacity = '0';
+    c.style.transform = 'translateY(16px)';
+    c.style.transition = 'opacity 0.4s ease, transform 0.4s ease';
+    cardObserver.observe(c);
+  });
+</script>
+</body>
+</html>
