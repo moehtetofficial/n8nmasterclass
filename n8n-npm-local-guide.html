@@ -579,6 +579,70 @@
   </div>
 
 
+
+  <!-- EXECUTE COMMAND -->
+  <div class="section-label">
+    <div class="snum pre">⚡</div>
+    <div>
+      <div class="stitle">Execute Command Node ဖွင့်နည်း</div>
+      <div class="ssub">n8n မှာ Execute Command node ကို UI မှာ မတွေ့ရင် ဒီနည်းဖြင့် ဖွင့်ပါ</div>
+    </div>
+  </div>
+
+  <div class="step-block open" id="exec1">
+    <div class="step-header" onclick="toggle('exec1')">
+      <div class="sicon">🖥️</div>
+      <div class="sinfo">
+        <div class="sname">N8N_RUNNERS_ENABLED=true ထည့်ပြီး run နည်း</div>
+        <div class="smeta">Execute Command node မတွေ့ရင် ဒီ environment variable လိုအပ်သည်</div>
+      </div>
+      <div class="stoggle">+</div>
+    </div>
+    <div class="sbody">
+
+      <div class="substep">
+        <div class="ssn">1</div>
+        <div class="ssc">
+          <div class="sst">n8n ရပ်ပါ</div>
+          <div class="code-block" style="margin-top:8px;">
+            <div class="code-header"><span class="clabel">Terminal</span><button class="copy-btn" onclick="copyCode(this)">copy</button></div>
+            <pre><span class="kw">pkill</span> <span class="fl">-f</span> n8n</pre>
+          </div>
+        </div>
+      </div>
+
+      <div class="substep">
+        <div class="ssn">2</div>
+        <div class="ssc">
+          <div class="sst">Variable ထည့်ပြီး ပြန်စပါ</div>
+          <div class="code-block" style="margin-top:8px;">
+            <div class="code-header"><span class="clabel">Terminal</span><button class="copy-btn" onclick="copyCode(this)">copy</button></div>
+            <pre><span class="kw">N8N_RUNNERS_ENABLED</span>=true n8n start</pre>
+          </div>
+        </div>
+      </div>
+
+      <div class="substep">
+        <div class="ssn">3</div>
+        <div class="ssc">
+          <div class="sst">Permanent ဖြစ်ချင်ရင် ~/.bashrc ထည့်ပါ</div>
+          <div class="ssd" style="margin-bottom:8px;">PC restart တိုင်း variable ထပ်ရိုက်စရာမလိုအောင် ~/.bashrc ထဲ ထည့်ထားပါ</div>
+          <div class="code-block">
+            <div class="code-header"><span class="clabel">Terminal</span><button class="copy-btn" onclick="copyCode(this)">copy</button></div>
+            <pre><span class="kw">echo</span> <span class="st">'export N8N_RUNNERS_ENABLED=true'</span> >> ~/.bashrc
+<span class="kw">source</span> ~/.bashrc
+<span class="kw">n8n</span> start</pre>
+          </div>
+          <div class="alert success" style="margin-top:10px;">
+            <span class="ai">✅</span>
+            <span style="font-family:'Noto Sans Myanmar',sans-serif;">ဒါဆိုရင် Execute Command node ကို n8n UI မှာ ရှာလို့ရပြီ</span>
+          </div>
+        </div>
+      </div>
+
+    </div>
+  </div>
+
   <!-- TROUBLESHOOTING -->
   <div class="section-label">
     <div class="snum" style="background:linear-gradient(135deg,#ef4444,#f97316);">🔧</div>
