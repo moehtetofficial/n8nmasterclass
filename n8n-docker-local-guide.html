@@ -704,6 +704,123 @@ abc123def456   docker.n8n.io/n8nio/n8n  Up 30 seconds   0.0.0.0:5678->5678/tcp</
     </div>
   </div>
 
+
+  <!-- TROUBLESHOOTING -->
+  <div class="section-label" style="margin-top:48px;">
+    <div class="snum" style="background:linear-gradient(135deg,#ef4444,#f97316);">🔧</div>
+    <div>
+      <div class="stitle">အဖြစ်များတဲ့ Error များ</div>
+      <div class="ssub">Docker ဖြင့် n8n run ရာတွင် တွေ့တတ်သော ပြဿနာများနှင့် ဖြေရှင်းနည်း</div>
+    </div>
+  </div>
+
+  <div class="step-block open" id="derr1">
+    <div class="step-header" onclick="toggle('derr1')">
+      <div class="sicon">🔴</div>
+      <div class="sinfo">
+        <div class="sname">docker: command not found</div>
+        <div class="smeta">Docker မ install ရသေးဘူး</div>
+      </div>
+      <div class="stoggle">+</div>
+    </div>
+    <div class="sbody">
+      <div class="alert warn"><span class="ai">⚠️</span><span style="font-family:'Noto Sans Myanmar',sans-serif;">Docker Desktop ကို ဦးစွာ install လုပ်ပြီး run ထားပါ — <strong>docker.com/get-started</strong></span></div>
+      <div class="code-block" style="margin-top:12px;">
+        <div class="code-header"><span class="clabel">Docker install စစ်ပါ</span><button class="copy-btn" onclick="copyCode(this)">copy</button></div>
+        <pre><span class="kw">docker</span> <span class="fl">--version</span>
+<span class="cm"># Docker version 24.x.x ဆိုရင် OK</span>
+
+<span class="cm"># Docker Desktop run မထားရင် မအလုပ်လုပ်ဘူး</span>
+<span class="cm"># System tray မှာ Docker icon ရှိမရှိ စစ်ပါ</span></pre>
+      </div>
+    </div>
+  </div>
+
+  <div class="step-block open" id="derr2">
+    <div class="step-header" onclick="toggle('derr2')">
+      <div class="sicon">🔴</div>
+      <div class="sinfo">
+        <div class="sname">Port 5678 already in use / address already in use</div>
+        <div class="smeta">Port 5678 ကို တခြား process သုံးနေတယ်</div>
+      </div>
+      <div class="stoggle">+</div>
+    </div>
+    <div class="sbody">
+      <div class="code-block">
+        <div class="code-header"><span class="clabel">Port ပြောင်း run နည်း</span><button class="copy-btn" onclick="copyCode(this)">copy</button></div>
+        <pre><span class="cm"># 5679 port သုံးပြီး run ပါ</span>
+<span class="kw">docker</span> run <span class="fl">-d</span> --name n8n   <span class="fl">-p</span> 5679:5678   <span class="fl">-v</span> n8n_data:/home/node/.n8n   docker.n8n.io/n8nio/n8n
+
+<span class="cm"># Browser မှာ http://localhost:5679 ဖြင့် ဝင်ပါ</span></pre>
+      </div>
+    </div>
+  </div>
+
+  <div class="step-block open" id="derr3">
+    <div class="step-header" onclick="toggle('derr3')">
+      <div class="sicon">🔴</div>
+      <div class="sinfo">
+        <div class="sname">Container exits immediately / Exited (1)</div>
+        <div class="smeta">Container start ဖြစ်ပြီး ချက်ချင်း ပိတ်သွားတယ်</div>
+      </div>
+      <div class="stoggle">+</div>
+    </div>
+    <div class="sbody">
+      <div class="code-block">
+        <div class="code-header"><span class="clabel">Log စစ်ပါ</span><button class="copy-btn" onclick="copyCode(this)">copy</button></div>
+        <pre><span class="cm"># Error message စစ်ပါ</span>
+<span class="kw">docker</span> logs n8n
+
+<span class="cm"># Container ဖျက်ပြီး ပြန် run ပါ</span>
+<span class="kw">docker</span> rm n8n
+<span class="kw">docker</span> run <span class="fl">-d</span> --name n8n   <span class="fl">-p</span> 5678:5678   <span class="fl">-v</span> n8n_data:/home/node/.n8n   docker.n8n.io/n8nio/n8n</pre>
+      </div>
+    </div>
+  </div>
+
+  <div class="step-block open" id="derr4">
+    <div class="step-header" onclick="toggle('derr4')">
+      <div class="sicon">🔴</div>
+      <div class="sinfo">
+        <div class="sname">Unable to find image / pull access denied</div>
+        <div class="smeta">Image download မရဘူး — internet / Docker login ပြဿနာ</div>
+      </div>
+      <div class="stoggle">+</div>
+    </div>
+    <div class="sbody">
+      <div class="code-block">
+        <div class="code-header"><span class="clabel">ဖြေရှင်းနည်း</span><button class="copy-btn" onclick="copyCode(this)">copy</button></div>
+        <pre><span class="cm"># Internet connection စစ်ပါ</span>
+<span class="cm"># ထပ် pull ကြိုးစားပါ</span>
+<span class="kw">docker</span> pull docker.n8n.io/n8nio/n8n
+
+<span class="cm"># မရသေးရင် Docker Hub မှ pull</span>
+<span class="kw">docker</span> pull n8nio/n8n
+<span class="kw">docker</span> run <span class="fl">-d</span> --name n8n   <span class="fl">-p</span> 5678:5678   <span class="fl">-v</span> n8n_data:/home/node/.n8n   n8nio/n8n</pre>
+      </div>
+    </div>
+  </div>
+
+  <div class="step-block open" id="derr5">
+    <div class="step-header" onclick="toggle('derr5')">
+      <div class="sicon">🔴</div>
+      <div class="sinfo">
+        <div class="sname">PC restart လုပ်ရင် n8n ပျောက်သွားတယ်</div>
+        <div class="smeta">Auto-restart မ set ရသေးဘူး</div>
+      </div>
+      <div class="stoggle">+</div>
+    </div>
+    <div class="sbody">
+      <div class="alert warn"><span class="ai">⚠️</span><span style="font-family:'Noto Sans Myanmar',sans-serif;"><code>--restart unless-stopped</code> flag ထည့်ရင် PC restart တိုင်း n8n အလိုအလျောက် start မည်။</span></div>
+      <div class="code-block" style="margin-top:12px;">
+        <div class="code-header"><span class="clabel">Auto-restart ထည့် run နည်း</span><button class="copy-btn" onclick="copyCode(this)">copy</button></div>
+        <pre><span class="cm"># Container ဖျက်ပြီး --restart flag ထည့်ပြီး ပြန် run</span>
+<span class="kw">docker</span> stop n8n && docker rm n8n
+<span class="kw">docker</span> run <span class="fl">-d</span> --name n8n   <span class="fl">--restart</span> unless-stopped   <span class="fl">-p</span> 5678:5678   <span class="fl">-v</span> n8n_data:/home/node/.n8n   docker.n8n.io/n8nio/n8n</pre>
+      </div>
+    </div>
+  </div>
+
   <div class="success-banner">
     <div class="big-icon">🎉</div>
     <h2>Setup Complete!</h2>
