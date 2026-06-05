@@ -329,6 +329,10 @@
               <pre><span class="kw">node</span> <span class="fl">--version</span>   <span class="cm"># v20.x.x</span>
 <span class="kw">npm</span> <span class="fl">--version</span>    <span class="cm"># 10.x.x</span></pre>
             </div>
+            <div class="alert warn" style="margin-top:10px;">
+              <span class="ai">⚠️</span>
+              <span style="font-family:'Noto Sans Myanmar',sans-serif;">n8n သည် Node.js <strong>v18</strong> နှင့် <strong>v20</strong> (LTS) ကိုသာ တရားဝင် support လုပ်သည်။ v22+ သုံးရင် install error ဖြစ်နိုင်သည် — LTS version ကိုသာ ရွေးပါ။</span>
+            </div>
           </div>
         </div>
       </div>
@@ -345,6 +349,10 @@
 
 <span class="kw">node</span> <span class="fl">--version</span>   <span class="cm"># v20.x.x</span>
 <span class="kw">npm</span> <span class="fl">--version</span>    <span class="cm"># 10.x.x</span></pre>
+            </div>
+            <div class="alert warn" style="margin-top:10px;">
+              <span class="ai">⚠️</span>
+              <span style="font-family:'Noto Sans Myanmar',sans-serif;">n8n သည် Node.js <strong>v18</strong> နှင့် <strong>v20</strong> (LTS) ကိုသာ တရားဝင် support လုပ်သည်။ v22+ သုံးရင် install error ဖြစ်နိုင်သည် — LTS version ကိုသာ ရွေးပါ။</span>
             </div>
           </div>
         </div>
@@ -566,6 +574,131 @@
 
 <span class="cm"># n8n uninstall လုပ်ချင်ရင်</span>
 <span class="kw">npm</span> uninstall <span class="fl">-g</span> n8n</pre>
+      </div>
+    </div>
+  </div>
+
+
+  <!-- TROUBLESHOOTING -->
+  <div class="section-label">
+    <div class="snum" style="background:linear-gradient(135deg,#ef4444,#f97316);">🔧</div>
+    <div>
+      <div class="stitle">အဖြစ်များတဲ့ Error များ</div>
+      <div class="ssub">npm ဖြင့် n8n install လုပ်ရာတွင် တွေ့တတ်သော ပြဿနာများနှင့် ဖြေရှင်းနည်း</div>
+    </div>
+  </div>
+
+  <div class="step-block open" id="err1">
+    <div class="step-header" onclick="toggle('err1')">
+      <div class="sicon">🔴</div>
+      <div class="sinfo">
+        <div class="sname">node: command not found / 'node' is not recognized</div>
+        <div class="smeta">Node.js မ install ရသေးဘူး သို့မဟုတ် PATH မ set ရသေးဘူး</div>
+      </div>
+      <div class="stoggle">+</div>
+    </div>
+    <div class="sbody">
+      <div class="alert warn"><span class="ai">⚠️</span><span style="font-family:'Noto Sans Myanmar',sans-serif;">Terminal/PowerShell ကို <strong>restart</strong> လုပ်ပြီး ထပ်ကြိုးစားပါ။ မရသေးရင် Node.js ကို ပြန် install လုပ်ပါ။</span></div>
+      <div class="code-block" style="margin-top:12px;">
+        <div class="code-header"><span class="clabel">ဖြေရှင်းနည်း</span><button class="copy-btn" onclick="copyCode(this)">copy</button></div>
+        <pre><span class="cm"># Terminal/PowerShell ပိတ်ပြီး ပြန်ဖွင့်ပါ</span>
+<span class="cm"># ထပ် check လုပ်ပါ</span>
+<span class="kw">node</span> <span class="fl">--version</span>
+
+<span class="cm"># မရသေးရင် — Windows မှာ System Restart လုပ်ပါ</span></pre>
+      </div>
+    </div>
+  </div>
+
+  <div class="step-block open" id="err2">
+    <div class="step-header" onclick="toggle('err2')">
+      <div class="sicon">🔴</div>
+      <div class="sinfo">
+        <div class="sname">engine "node" is incompatible</div>
+        <div class="smeta">Node.js version မ support ဘူး — v22+ သုံးနေတယ်</div>
+      </div>
+      <div class="stoggle">+</div>
+    </div>
+    <div class="sbody">
+      <div class="alert warn"><span class="ai">⚠️</span><span style="font-family:'Noto Sans Myanmar',sans-serif;">n8n သည် Node.js <strong>v18</strong> နှင့် <strong>v20</strong> ကိုသာ support လုပ်သည်။ v22+ ဆိုရင် nvm ဖြင့် version ပြောင်းပါ။</span></div>
+      <div class="code-block" style="margin-top:12px;">
+        <div class="code-header"><span class="clabel">nvm ဖြင့် ဖြေရှင်းနည်း (Windows)</span><button class="copy-btn" onclick="copyCode(this)">copy</button></div>
+        <pre><span class="cm"># nvm-windows ကို install လုပ်ပါ: github.com/coreybutler/nvm-windows</span>
+<span class="kw">nvm</span> install 20
+<span class="kw">nvm</span> use 20
+<span class="kw">node</span> <span class="fl">--version</span>   <span class="cm"># v20.x.x ဖြစ်သင့်သည်</span>
+<span class="kw">npm</span> install <span class="fl">-g</span> n8n</pre>
+      </div>
+      <div class="code-block" style="margin-top:8px;">
+        <div class="code-header"><span class="clabel">nvm ဖြင့် ဖြေရှင်းနည်း (macOS/Linux)</span><button class="copy-btn" onclick="copyCode(this)">copy</button></div>
+        <pre><span class="cm"># nvm install</span>
+<span class="kw">curl</span> <span class="fl">-o-</span> https://raw.githubusercontent.com/nvm-sh/nvm/v0.39.0/install.sh | bash
+<span class="kw">source</span> ~/.bashrc
+
+<span class="kw">nvm</span> install 20
+<span class="kw">nvm</span> use 20
+<span class="kw">npm</span> install <span class="fl">-g</span> n8n</pre>
+      </div>
+    </div>
+  </div>
+
+  <div class="step-block open" id="err3">
+    <div class="step-header" onclick="toggle('err3')">
+      <div class="sicon">🔴</div>
+      <div class="sinfo">
+        <div class="sname">EACCES: permission denied</div>
+        <div class="smeta">Windows — Administrator အဖြစ် run မလုပ်ရသေးဘူး</div>
+      </div>
+      <div class="stoggle">+</div>
+    </div>
+    <div class="sbody">
+      <div class="alert warn"><span class="ai">⚠️</span><span style="font-family:'Noto Sans Myanmar',sans-serif;">Windows မှာ PowerShell ကို <strong>Run as Administrator</strong> ဖြင့် ဖွင့်မှ npm global install အလုပ်လုပ်မည်။</span></div>
+      <div class="code-block" style="margin-top:12px;">
+        <div class="code-header"><span class="clabel">ဖြေရှင်းနည်း</span></div>
+        <pre><span class="cm"># Windows Key → "PowerShell" ရိုက် → Right-click → Run as Administrator</span>
+<span class="cm"># ထပ်ကြိုးစားပါ</span>
+<span class="kw">npm</span> install <span class="fl">-g</span> n8n</pre>
+      </div>
+    </div>
+  </div>
+
+  <div class="step-block open" id="err4">
+    <div class="step-header" onclick="toggle('err4')">
+      <div class="sicon">🔴</div>
+      <div class="sinfo">
+        <div class="sname">n8n: command not found (install ပြီးသောအခါ)</div>
+        <div class="smeta">npm global bin PATH မ set ရသေးဘူး</div>
+      </div>
+      <div class="stoggle">+</div>
+    </div>
+    <div class="sbody">
+      <div class="code-block">
+        <div class="code-header"><span class="clabel">npm global bin path စစ်ပါ</span><button class="copy-btn" onclick="copyCode(this)">copy</button></div>
+        <pre><span class="kw">npm</span> config get prefix
+<span class="cm"># ထွက်လာတဲ့ path ကို System PATH ထဲ ထည့်ပါ</span>
+<span class="cm"># Terminal restart လုပ်ပြီး ထပ်ကြိုးစားပါ</span>
+<span class="kw">n8n</span> <span class="fl">--version</span></pre>
+      </div>
+    </div>
+  </div>
+
+  <div class="step-block open" id="err5">
+    <div class="step-header" onclick="toggle('err5')">
+      <div class="sicon">🔴</div>
+      <div class="sinfo">
+        <div class="sname">Port 5678 already in use</div>
+        <div class="smeta">n8n ကို run ဖို့ Port 5678 အသုံးမပြုနိုင်ဘူး</div>
+      </div>
+      <div class="stoggle">+</div>
+    </div>
+    <div class="sbody">
+      <div class="code-block">
+        <div class="code-header"><span class="clabel">Port ပြောင်း run နည်း</span><button class="copy-btn" onclick="copyCode(this)">copy</button></div>
+        <pre><span class="cm"># Port ပြောင်း run နည်း</span>
+<span class="kw">n8n</span> start <span class="fl">--port</span> 5679
+
+<span class="cm"># ဒါမှမဟုတ် ENV ထည့်ပါ</span>
+<span class="kw">N8N_PORT</span>=5679 n8n start</pre>
       </div>
     </div>
   </div>
