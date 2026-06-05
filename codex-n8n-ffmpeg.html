@@ -547,41 +547,65 @@
     </div>
   </div>
 
-  <div class="prompt-box">
-    <div class="prompt-header">
-      <span class="prompt-label">📋 Codex Prompt — Full</span>
-      <button class="copy-btn" id="promptCopyBtn" onclick="copyPrompt(this)">copy all</button>
-    </div>
-    <div class="prompt-content" id="promptText">I want to set up n8n on my Windows 11 machine using Docker, include FFmpeg inside the container, and create a test workflow that runs FFmpeg from an Execute Command node.
+  <!-- Prompt Tabs -->
+  <div style="display:flex; gap:8px; margin-bottom:12px;">
+    <button class="os-tab active" onclick="switchPrompt(this,'pdocker')" style="font-size:13px; padding:8px 18px;">🐳 Docker</button>
+    <button class="os-tab" onclick="switchPrompt(this,'pnpm')" style="font-size:13px; padding:8px 18px;">📦 npm</button>
+  </div>
+
+  <!-- Docker Prompt -->
+  <div id="pdocker" class="prompt-tab-content">
+    <div class="prompt-box">
+      <div class="prompt-header">
+        <span class="prompt-label">📋 Codex Prompt — Docker</span>
+        <button class="copy-btn" onclick="copyPromptById('dockerPromptText', this)">copy all</button>
+      </div>
+      <div class="prompt-content" id="dockerPromptText">I want to set up n8n on my Windows 11 machine using Docker with FFmpeg included.
 
 Tasks:
-
-1. Check if Docker Desktop is installed.
-2. If Docker is missing:
-   - Download the latest Docker Desktop installer for Windows 11
-   - Install Docker Desktop silently or with minimal prompts
-3. Verify Docker is running:
-   docker --version
-4. Create a Dockerfile to build a custom n8n image with FFmpeg installed:
+1. Check if Docker Desktop is installed. If missing, download and install it via winget: winget install Docker.DockerDesktop
+2. Verify Docker is running: docker --version
+3. Create a Dockerfile with:
    - Base image: n8nio/n8n:latest
-   - Install FFmpeg inside the container (apt-get update && apt-get install -y ffmpeg)
-   - Set user back to node
-5. Build the Docker image, tag it as n8n-ffmpeg
-6. Run the Docker container with:
-   - Container name: n8n
-   - Ports: 5678:5678
-   - Auto-restart enabled
-   - Volume mapped to C:\n8n-data for persistent workflow storage
-7. Verify that n8n is accessible at http://localhost:5678
-8. Inside n8n, create a test workflow with:
-   - Manual Trigger node
-   - Execute Command node
-9. Configure Execute Command node to run:
-   ffmpeg -version
-10. Connect the nodes, save the workflow, and execute it
-11. Confirm that the Execute Command node outputs FFmpeg version correctly
-12. Ask for approval only when Windows requires administrator permissions
-13. Provide step-by-step updates and notify if any command fails</div>
+   - USER root
+   - RUN apt-get update && apt-get install -y ffmpeg && apt-get clean
+   - USER node
+4. Build the image: docker build -t n8n-ffmpeg .
+5. Run the container:
+   docker run -d --name n8n --restart unless-stopped -p 5678:5678 -v C:
+8n-data:/home/node/.n8n -e N8N_RUNNERS_ENABLED=true n8n-ffmpeg
+6. Enable Execute Command node by setting environment variable N8N_RUNNERS_ENABLED=true inside the container (already included in step 5 via -e flag)
+7. Verify n8n is accessible at http://localhost:5678
+8. Verify FFmpeg is installed inside container: docker exec n8n ffmpeg -version
+9. Ask for approval only when Windows requires administrator permissions
+10. Provide step-by-step updates and notify if any command fails</div>
+    </div>
+  </div>
+
+  <!-- npm Prompt -->
+  <div id="pnpm" class="prompt-tab-content" style="display:none;">
+    <div class="prompt-box">
+      <div class="prompt-header">
+        <span class="prompt-label">📋 Codex Prompt — npm</span>
+        <button class="copy-btn" onclick="copyPromptById('npmPromptText', this)">copy all</button>
+      </div>
+      <div class="prompt-content" id="npmPromptText">I want to set up n8n on my Windows 11 machine using npm with FFmpeg included.
+
+Tasks:
+1. Check if Node.js is installed: node --version. Required: v18 or v20 LTS only. If missing or wrong version, install nvm-windows from https://github.com/coreybutler/nvm-windows/releases, then: nvm install 20 && nvm use 20
+2. Install n8n globally: npm install -g n8n
+3. Verify installation: n8n --version
+4. Install FFmpeg on Windows:
+   - Check if winget is available
+   - Run: winget install Gyan.FFmpeg
+   - Verify: ffmpeg -version
+5. Enable Execute Command node by adding to system environment: setx N8N_RUNNERS_ENABLED true
+6. Close and reopen terminal, then start n8n: n8n start
+7. Verify n8n is accessible at http://localhost:5678
+8. To make N8N_RUNNERS_ENABLED permanent, it is already set via setx in step 5
+9. Ask for approval only when Windows requires administrator permissions
+10. Provide step-by-step updates and notify if any command fails</div>
+    </div>
   </div>
 
   <div class="divider"></div>
@@ -800,13 +824,20 @@ Tasks:
     });
   }
 
-  function copyPrompt(btn) {
-    const text = document.getElementById('promptText').innerText;
+  function copyPromptById(id, btn) {
+    const text = document.getElementById(id).innerText;
     navigator.clipboard.writeText(text.trim()).then(() => {
       btn.textContent = '✓ copied!';
       btn.classList.add('copied');
       setTimeout(() => { btn.textContent = 'copy all'; btn.classList.remove('copied'); }, 3000);
     });
+  }
+
+  function switchPrompt(btn, id) {
+    document.querySelectorAll('.prompt-tab-content').forEach(el => el.style.display = 'none');
+    document.getElementById(id).style.display = 'block';
+    btn.closest('div').querySelectorAll('.os-tab').forEach(b => b.classList.remove('active'));
+    btn.classList.add('active');
   }
 
   // Progress bar
