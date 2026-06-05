@@ -1,0 +1,840 @@
+<!DOCTYPE html>
+<html lang="my">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>n8n + FFmpeg — Codex Docker Setup Guide</title>
+<link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@300;400;500;700&family=Noto+Sans+Myanmar:wght@400;700&family=Familjen+Grotesk:wght@400;600;700;800&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --bg: #070b0f;
+    --surface: #0d1117;
+    --surface2: #161b22;
+    --border: #21262d;
+    --accent: #58a6ff;
+    --accent2: #1f6feb;
+    --green: #3fb950;
+    --orange: #f78166;
+    --yellow: #e3b341;
+    --purple: #bc8cff;
+    --cyan: #39d353;
+    --text: #e6edf3;
+    --muted: #7d8590;
+    --code-bg: #040608;
+  }
+
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+
+  body {
+    background: var(--bg);
+    color: var(--text);
+    font-family: 'Familjen Grotesk', sans-serif;
+    line-height: 1.6;
+    overflow-x: hidden;
+  }
+
+  /* Grid background */
+  body::before {
+    content: '';
+    position: fixed;
+    inset: 0;
+    background-image:
+      linear-gradient(rgba(88,166,255,0.025) 1px, transparent 1px),
+      linear-gradient(90deg, rgba(88,166,255,0.025) 1px, transparent 1px);
+    background-size: 40px 40px;
+    pointer-events: none;
+    z-index: 0;
+  }
+
+  /* Progress bar */
+  .progress-bar { position: fixed; top: 0; left: 0; right: 0; height: 2px; background: var(--border); z-index: 200; }
+  .progress-fill { height: 100%; background: linear-gradient(90deg, var(--accent2), var(--accent), var(--cyan)); width: 0%; transition: width 0.1s; }
+
+  /* HEADER */
+  header {
+    position: relative;
+    padding: 80px 40px 64px;
+    border-bottom: 1px solid var(--border);
+    overflow: hidden;
+    z-index: 1;
+  }
+
+  header::after {
+    content: 'CODEX';
+    position: absolute;
+    right: -40px;
+    top: -30px;
+    font-size: 180px;
+    font-weight: 800;
+    color: rgba(88,166,255,0.03);
+    pointer-events: none;
+    letter-spacing: -8px;
+    font-family: 'JetBrains Mono', monospace;
+  }
+
+  .container { max-width: 880px; margin: 0 auto; padding: 0 40px 80px; position: relative; z-index: 1; }
+
+  .header-inner { max-width: 880px; margin: 0 auto; position: relative; z-index: 1; }
+
+  .header-tags {
+    display: flex;
+    gap: 8px;
+    flex-wrap: wrap;
+    margin-bottom: 28px;
+  }
+
+  .tag {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 10px;
+    font-weight: 500;
+    letter-spacing: 1.5px;
+    text-transform: uppercase;
+    padding: 4px 10px;
+    border-radius: 4px;
+  }
+
+  .tag-blue  { background: rgba(88,166,255,0.1);  border: 1px solid rgba(88,166,255,0.3);  color: var(--accent); }
+  .tag-green { background: rgba(63,185,80,0.1);   border: 1px solid rgba(63,185,80,0.3);   color: var(--green); }
+  .tag-orange{ background: rgba(247,129,102,0.1); border: 1px solid rgba(247,129,102,0.3); color: var(--orange); }
+  .tag-purple{ background: rgba(188,140,255,0.1); border: 1px solid rgba(188,140,255,0.3); color: var(--purple); }
+
+  h1 {
+    font-size: clamp(30px, 5vw, 52px);
+    font-weight: 800;
+    line-height: 1.08;
+    letter-spacing: -1.5px;
+    margin-bottom: 18px;
+  }
+
+  h1 .blue   { color: var(--accent); }
+  h1 .green  { color: var(--green); }
+  h1 .orange { color: var(--orange); }
+
+  .header-desc {
+    font-family: 'Noto Sans Myanmar', sans-serif;
+    color: var(--muted);
+    font-size: 14px;
+    max-width: 560px;
+    line-height: 1.85;
+    margin-bottom: 32px;
+  }
+
+  /* PROMPT BOX */
+  .prompt-box {
+    background: var(--code-bg);
+    border: 1px solid rgba(88,166,255,0.2);
+    border-radius: 12px;
+    overflow: hidden;
+    margin-top: 8px;
+  }
+
+  .prompt-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 10px 16px;
+    background: rgba(88,166,255,0.05);
+    border-bottom: 1px solid var(--border);
+  }
+
+  .prompt-label {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 10px;
+    font-weight: 700;
+    letter-spacing: 2px;
+    text-transform: uppercase;
+    color: var(--accent);
+  }
+
+  .copy-btn {
+    background: none;
+    border: 1px solid var(--border);
+    color: var(--muted);
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 11px;
+    padding: 3px 10px;
+    border-radius: 4px;
+    cursor: pointer;
+    transition: all 0.15s;
+  }
+  .copy-btn:hover { border-color: var(--accent); color: var(--accent); }
+  .copy-btn.copied { border-color: var(--green); color: var(--green); }
+
+  /* STEP SECTIONS */
+  .section-label {
+    display: flex;
+    align-items: flex-start;
+    gap: 16px;
+    margin: 56px 0 20px;
+  }
+
+  .snum {
+    width: 36px; height: 36px;
+    border-radius: 8px;
+    background: linear-gradient(135deg, var(--accent2), var(--accent));
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 13px;
+    font-weight: 700;
+    color: #fff;
+    flex-shrink: 0;
+    margin-top: 2px;
+  }
+
+  .snum.icon {
+    background: var(--surface2);
+    border: 1px solid var(--border);
+    font-size: 17px;
+  }
+
+  .stitle { font-size: 20px; font-weight: 800; letter-spacing: -0.3px; }
+  .ssub { font-family: 'Noto Sans Myanmar', sans-serif; font-size: 13px; color: var(--muted); margin-top: 3px; line-height: 1.7; }
+
+  /* STEP BLOCKS */
+  .step-block {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 12px;
+    margin-bottom: 12px;
+    overflow: hidden;
+    transition: border-color 0.2s;
+  }
+
+  .step-block:hover { border-color: rgba(88,166,255,0.2); }
+
+  .step-header {
+    padding: 16px 20px;
+    display: flex;
+    align-items: center;
+    gap: 14px;
+    cursor: pointer;
+    user-select: none;
+    border-bottom: 1px solid transparent;
+    transition: background 0.15s, border-color 0.2s;
+  }
+
+  .step-header:hover { background: rgba(255,255,255,0.02); }
+  .step-block.open .step-header { border-bottom-color: var(--border); }
+
+  .sicon { font-size: 20px; width: 28px; text-align: center; flex-shrink: 0; }
+  .sinfo { flex: 1; }
+  .sname { font-size: 14px; font-weight: 700; }
+  .smeta { font-size: 11px; color: var(--muted); font-family: 'JetBrains Mono', monospace; margin-top: 2px; }
+  .stoggle { font-family: 'JetBrains Mono', monospace; font-size: 18px; color: var(--muted); transition: transform 0.2s, color 0.2s; }
+  .step-block.open .stoggle { transform: rotate(45deg); color: var(--accent); }
+
+  .sbody { display: none; padding: 20px; }
+  .step-block.open .sbody { display: block; }
+
+  /* CODE BLOCKS */
+  .code-block {
+    background: var(--code-bg);
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    overflow: hidden;
+    margin: 10px 0;
+  }
+
+  .code-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 8px 14px;
+    border-bottom: 1px solid var(--border);
+    background: rgba(255,255,255,0.015);
+  }
+
+  .clabel { font-family: 'JetBrains Mono', monospace; font-size: 10px; color: var(--muted); letter-spacing: 1px; text-transform: uppercase; }
+
+  pre {
+    padding: 16px;
+    overflow-x: auto;
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 13px;
+    line-height: 1.8;
+  }
+
+  .cm  { color: #484f58; font-style: italic; }
+  .kw  { color: #ff7b72; }
+  .fl  { color: #ffa657; }
+  .st  { color: #a5d6ff; }
+  .ok  { color: var(--green); }
+  .num { color: var(--purple); }
+  .key { color: var(--cyan); }
+
+  code {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 12px;
+    background: rgba(88,166,255,0.08);
+    color: var(--accent);
+    padding: 2px 6px;
+    border-radius: 4px;
+    border: 1px solid rgba(88,166,255,0.15);
+  }
+
+  /* ALERTS */
+  .alert {
+    display: flex;
+    gap: 12px;
+    padding: 12px 16px;
+    border-radius: 8px;
+    margin: 10px 0;
+    font-family: 'Noto Sans Myanmar', sans-serif;
+    font-size: 13px;
+    line-height: 1.8;
+  }
+
+  .alert.warn    { background: rgba(227,179,65,0.07);  border: 1px solid rgba(227,179,65,0.25);  color: #f0c674; }
+  .alert.info    { background: rgba(88,166,255,0.07);  border: 1px solid rgba(88,166,255,0.25);  color: #79c0ff; }
+  .alert.success { background: rgba(63,185,80,0.07);   border: 1px solid rgba(63,185,80,0.25);   color: #7ee787; }
+  .alert.danger  { background: rgba(247,129,102,0.07); border: 1px solid rgba(247,129,102,0.25); color: #ffa198; }
+  .ai { font-size: 14px; flex-shrink: 0; margin-top: 2px; }
+
+  /* SUBSTEPS */
+  .substep { display: flex; gap: 14px; padding: 14px 0; border-bottom: 1px solid var(--border); }
+  .substep:first-child { padding-top: 0; }
+  .substep:last-child { border-bottom: none; padding-bottom: 0; }
+  .ssn { width: 22px; height: 22px; border-radius: 50%; background: var(--surface2); border: 1px solid var(--border); display: flex; align-items: center; justify-content: center; font-family: 'JetBrains Mono', monospace; font-size: 10px; font-weight: 700; color: var(--muted); flex-shrink: 0; margin-top: 2px; }
+  .ssc { flex: 1; }
+  .sst { font-size: 14px; font-weight: 700; margin-bottom: 5px; }
+  .ssd { font-family: 'Noto Sans Myanmar', sans-serif; font-size: 13px; color: var(--muted); line-height: 1.8; }
+
+  /* DOCKERFILE BLOCK */
+  .dockerfile {
+    background: var(--code-bg);
+    border: 1px solid rgba(63,185,80,0.25);
+    border-radius: 10px;
+    overflow: hidden;
+    margin: 12px 0;
+  }
+
+  .dockerfile-header {
+    padding: 10px 16px;
+    background: rgba(63,185,80,0.05);
+    border-bottom: 1px solid rgba(63,185,80,0.15);
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+  }
+
+  .dockerfile-label {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 11px;
+    font-weight: 700;
+    color: var(--green);
+    letter-spacing: 1px;
+  }
+
+  /* WORKFLOW VISUAL */
+  .workflow-visual {
+    display: flex;
+    align-items: center;
+    gap: 0;
+    padding: 20px;
+    background: var(--surface2);
+    border: 1px solid var(--border);
+    border-radius: 10px;
+    margin: 14px 0;
+    overflow-x: auto;
+  }
+
+  .wf-node {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    padding: 10px 16px;
+    text-align: center;
+    flex-shrink: 0;
+    min-width: 120px;
+  }
+
+  .wf-node .node-icon { font-size: 22px; margin-bottom: 4px; }
+  .wf-node .node-name { font-size: 11px; font-weight: 700; font-family: 'JetBrains Mono', monospace; color: var(--muted); }
+  .wf-node.trigger { border-color: rgba(63,185,80,0.4); }
+  .wf-node.execute { border-color: rgba(88,166,255,0.4); }
+
+  .wf-arrow {
+    font-family: 'JetBrains Mono', monospace;
+    color: var(--muted);
+    padding: 0 12px;
+    font-size: 18px;
+    flex-shrink: 0;
+  }
+
+  /* PROMPT CONTENT */
+  .prompt-content {
+    padding: 20px;
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 12.5px;
+    line-height: 1.9;
+    color: #c9d1d9;
+    white-space: pre-wrap;
+    max-height: 400px;
+    overflow-y: auto;
+    scrollbar-width: thin;
+    scrollbar-color: var(--border) transparent;
+  }
+
+  .prompt-content::-webkit-scrollbar { width: 5px; }
+  .prompt-content::-webkit-scrollbar-thumb { background: var(--border); border-radius: 3px; }
+
+  .p-heading { color: var(--accent); font-weight: 700; }
+  .p-task    { color: var(--green); }
+  .p-num     { color: var(--purple); }
+  .p-cmd     { color: var(--orange); }
+
+  /* SUCCESS */
+  .success-banner {
+    margin-top: 56px;
+    background: linear-gradient(135deg, rgba(63,185,80,0.06), rgba(88,166,255,0.06));
+    border: 1px solid rgba(63,185,80,0.2);
+    border-radius: 16px;
+    padding: 40px;
+    text-align: center;
+  }
+
+  .success-banner .big-icon { font-size: 48px; margin-bottom: 16px; }
+  .success-banner h2 { font-size: 22px; font-weight: 800; color: var(--green); margin-bottom: 10px; }
+  .success-banner p { font-family: 'Noto Sans Myanmar', sans-serif; font-size: 14px; color: var(--muted); line-height: 1.85; margin-bottom: 24px; }
+  .url-pill { display: inline-flex; align-items: center; gap: 10px; background: var(--code-bg); border: 1px solid rgba(88,166,255,0.35); border-radius: 8px; padding: 10px 24px; font-family: 'JetBrains Mono', monospace; font-size: 15px; color: var(--accent); text-decoration: none; transition: all 0.15s; }
+  .url-pill:hover { background: rgba(88,166,255,0.07); }
+
+  .divider { height: 1px; background: linear-gradient(90deg, transparent, var(--border), transparent); margin: 48px 0; }
+
+  @media (max-width: 600px) {
+    header { padding: 52px 20px 44px; }
+    .container { padding: 0 20px 60px; }
+    h1 { font-size: 28px; }
+  }
+</style>
+</head>
+<body>
+
+<div class="progress-bar"><div class="progress-fill" id="prog"></div></div>
+
+<header>
+  <div class="header-inner">
+    <div class="header-tags">
+      <span class="tag tag-blue">Codex</span>
+      <span class="tag tag-green">Docker</span>
+      <span class="tag tag-orange">n8n + FFmpeg</span>
+      <span class="tag tag-purple">Windows 11</span>
+    </div>
+    <h1>
+      <span class="blue">Codex</span> ဖြင့်<br>
+      <span class="green">n8n</span> + <span class="orange">FFmpeg</span><br>
+      Docker Setup
+    </h1>
+    <p class="header-desc">Codex desktop app ကို download ဆင်းပြီး အောက်ပါ prompt ကို paste လုပ်ရုံဖြင့် Docker ပေါ်မှာ n8n + FFmpeg တပ်ဆင်ခြင်းကို အလိုအလျောက် ဆောင်ရွက်မည်။</p>
+  </div>
+</header>
+
+<div class="container">
+
+  <!-- STEP 1: Codex Download -->
+  <div class="section-label">
+    <div class="snum">1</div>
+    <div>
+      <div class="stitle">Codex Desktop App ဒေါင်းလုဒ်ဆွဲပြီး Install လုပ်ပါ</div>
+      <div class="ssub">OpenAI Codex desktop app ကို Windows 11 မှာ install လုပ်ပါ</div>
+    </div>
+  </div>
+
+  <div class="step-block open" id="s1">
+    <div class="step-header" onclick="toggle('s1')">
+      <div class="sicon">⬇️</div>
+      <div class="sinfo">
+        <div class="sname">Codex Download & Install</div>
+        <div class="smeta">chatgpt.com/codex → Download for Windows</div>
+      </div>
+      <div class="stoggle">+</div>
+    </div>
+    <div class="sbody">
+      <div class="substep">
+        <div class="ssn">1</div>
+        <div class="ssc">
+          <div class="sst">Codex Website သို့ သွားပါ</div>
+          <div class="ssd" style="margin-bottom:8px;">Browser မှာ အောက်ပါ URL ကို ဖွင့်ပါ</div>
+          <div class="code-block">
+            <div class="code-header"><span class="clabel">URL</span></div>
+            <pre><span class="ok">https://chatgpt.com/codex</span></pre>
+          </div>
+        </div>
+      </div>
+      <div class="substep">
+        <div class="ssn">2</div>
+        <div class="ssc">
+          <div class="sst">Download for Windows ကို နှိပ်ပါ</div>
+          <div class="ssd">"Download for Windows" button ကို နှိပ်ပြီး <code>.exe</code> installer ကို ဒေါင်းလုဒ်ဆွဲပါ</div>
+        </div>
+      </div>
+      <div class="substep">
+        <div class="ssn">3</div>
+        <div class="ssc">
+          <div class="sst">Install လုပ်ပါ</div>
+          <div class="ssd">ဒေါင်းဆင်းလာတဲ့ <code>.exe</code> ကို double-click နှိပ်ပြီး install လုပ်ပါ</div>
+          <div class="alert warn" style="margin-top:8px;">
+            <span class="ai">⚠️</span>
+            <span>Windows UAC popup ပေါ်လာရင် <strong>Yes</strong> နှိပ်ပါ</span>
+          </div>
+        </div>
+      </div>
+      <div class="substep">
+        <div class="ssn">4</div>
+        <div class="ssc">
+          <div class="sst">OpenAI account ဖြင့် Sign in လုပ်ပါ</div>
+          <div class="ssd">Install ပြီးရင် app ဖွင့်ပြီး OpenAI / ChatGPT account ဖြင့် login ဝင်ပါ</div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- STEP 2: New Task -->
+  <div class="section-label">
+    <div class="snum">2</div>
+    <div>
+      <div class="stitle">Codex မှာ New Task ဖန်တီးပါ</div>
+      <div class="ssub">Codex app ဖွင့်ပြီး prompt ထည့်ဖို့ အဆင်သင့်ပြုလုပ်ပါ</div>
+    </div>
+  </div>
+
+  <div class="step-block open" id="s2">
+    <div class="step-header" onclick="toggle('s2')">
+      <div class="sicon">🖥️</div>
+      <div class="sinfo">
+        <div class="sname">Codex App ဖွင့်ပြီး Task ကို စတင်ပါ</div>
+        <div class="smeta">New Task → Terminal access ရှိသည် → Prompt paste လုပ်ပါ</div>
+      </div>
+      <div class="stoggle">+</div>
+    </div>
+    <div class="sbody">
+      <div class="substep">
+        <div class="ssn">1</div>
+        <div class="ssc">
+          <div class="sst">Codex App ဖွင့်ပါ</div>
+          <div class="ssd">Desktop shortcut ဒါမှမဟုတ် Start Menu မှ Codex ကို ဖွင့်ပါ</div>
+        </div>
+      </div>
+      <div class="substep">
+        <div class="ssn">2</div>
+        <div class="ssc">
+          <div class="sst">"New Task" သို့မဟုတ် Chat input ကို ဖွင့်ပါ</div>
+          <div class="ssd">Codex မှာ terminal/shell access ဖြင့် task run လုပ်နိုင်တဲ့ mode ကို ရွေးပါ</div>
+        </div>
+      </div>
+      <div class="substep">
+        <div class="ssn">3</div>
+        <div class="ssc">
+          <div class="sst">အောက်ပါ prompt ကို copy ပြီး paste လုပ်ပါ</div>
+          <div class="ssd">Section 3 မှ prompt အပြည့်ကို copy ကူးပြီး input box ထဲ paste ချပါ</div>
+        </div>
+      </div>
+      <div class="alert info">
+        <span class="ai">ℹ️</span>
+        <span>Codex က Administrator permissions လိုတာတွေ တောင်းမည် — <strong>Approve</strong> နှိပ်ပေးပါ</span>
+      </div>
+    </div>
+  </div>
+
+  <!-- STEP 3: THE PROMPT -->
+  <div class="section-label">
+    <div class="snum">3</div>
+    <div>
+      <div class="stitle">Codex Prompt — Copy ကူးပြီး Paste ချပါ</div>
+      <div class="ssub">ဒီ prompt တစ်ခုတည်းဖြင့် Docker + n8n + FFmpeg အားလုံး အလိုအလျောက် setup ဖြစ်မည်</div>
+    </div>
+  </div>
+
+  <div class="prompt-box">
+    <div class="prompt-header">
+      <span class="prompt-label">📋 Codex Prompt — Full</span>
+      <button class="copy-btn" id="promptCopyBtn" onclick="copyPrompt(this)">copy all</button>
+    </div>
+    <div class="prompt-content" id="promptText">I want to set up n8n on my Windows 11 machine using Docker, include FFmpeg inside the container, and create a test workflow that runs FFmpeg from an Execute Command node.
+
+Tasks:
+
+1. Check if Docker Desktop is installed.
+2. If Docker is missing:
+   - Download the latest Docker Desktop installer for Windows 11
+   - Install Docker Desktop silently or with minimal prompts
+3. Verify Docker is running:
+   docker --version
+4. Create a Dockerfile to build a custom n8n image with FFmpeg installed:
+   - Base image: n8nio/n8n:latest
+   - Install FFmpeg inside the container (apt-get update && apt-get install -y ffmpeg)
+   - Set user back to node
+5. Build the Docker image, tag it as n8n-ffmpeg
+6. Run the Docker container with:
+   - Container name: n8n
+   - Ports: 5678:5678
+   - Auto-restart enabled
+   - Volume mapped to C:\n8n-data for persistent workflow storage
+7. Verify that n8n is accessible at http://localhost:5678
+8. Inside n8n, create a test workflow with:
+   - Manual Trigger node
+   - Execute Command node
+9. Configure Execute Command node to run:
+   ffmpeg -version
+10. Connect the nodes, save the workflow, and execute it
+11. Confirm that the Execute Command node outputs FFmpeg version correctly
+12. Ask for approval only when Windows requires administrator permissions
+13. Provide step-by-step updates and notify if any command fails</div>
+  </div>
+
+  <div class="divider"></div>
+
+  <!-- WHAT CODEX WILL DO -->
+  <div class="section-label">
+    <div class="snum icon">🤖</div>
+    <div>
+      <div class="stitle">Codex လုပ်ဆောင်မည့် အဆင့်များ</div>
+      <div class="ssub">Prompt ကို paste ချပြီးနောက် Codex က ဒီ အဆင့်တွေကို အလိုအလျောက် run မည်</div>
+    </div>
+  </div>
+
+  <div class="step-block open" id="w1">
+    <div class="step-header" onclick="toggle('w1')">
+      <div class="sicon">🐳</div>
+      <div class="sinfo">
+        <div class="sname">Docker Desktop စစ်ဆေး + Install</div>
+        <div class="smeta">task 1–3 · docker --version · auto-install if missing</div>
+      </div>
+      <div class="stoggle">+</div>
+    </div>
+    <div class="sbody">
+      <div class="code-block">
+        <div class="code-header"><span class="clabel">Codex မှ run မည့် commands</span></div>
+        <pre><span class="cm"># Docker ရှိ/မရှိ စစ်ဆေးမည်</span>
+<span class="kw">docker</span> <span class="fl">--version</span>
+
+<span class="cm"># မရှိရင် — Docker Desktop installer download + install</span>
+<span class="cm"># winget ဒါမှမဟုတ် direct download မှတဆင့်</span>
+<span class="kw">winget</span> install Docker.DockerDesktop</pre>
+      </div>
+      <div class="alert warn">
+        <span class="ai">⚠️</span>
+        <span>Docker install အတွက် Administrator permission လိုနိုင်သည် — Codex မှ approval တောင်းမည်</span>
+      </div>
+    </div>
+  </div>
+
+  <div class="step-block open" id="w2">
+    <div class="step-header" onclick="toggle('w2')">
+      <div class="sicon">📄</div>
+      <div class="sinfo">
+        <div class="sname">Dockerfile ဖန်တီး + Image Build</div>
+        <div class="smeta">task 4–5 · n8n + FFmpeg custom image · tag: n8n-ffmpeg</div>
+      </div>
+      <div class="stoggle">+</div>
+    </div>
+    <div class="sbody">
+      <div class="dockerfile">
+        <div class="dockerfile-header">
+          <span class="dockerfile-label">📄 Dockerfile</span>
+          <button class="copy-btn" onclick="copyCode(this)">copy</button>
+        </div>
+        <pre><span class="cm"># Base: official n8n image</span>
+<span class="kw">FROM</span> <span class="st">n8nio/n8n:latest</span>
+
+<span class="cm"># Root ဖြင့် FFmpeg install</span>
+<span class="kw">USER</span> <span class="st">root</span>
+<span class="kw">RUN</span> <span class="fl">apt-get update</span> && \
+    <span class="fl">apt-get install</span> <span class="num">-y</span> ffmpeg && \
+    <span class="fl">apt-get clean</span> && \
+    <span class="fl">rm -rf</span> /var/lib/apt/lists/*
+
+<span class="cm"># node user ပြန်သတ်မှတ်</span>
+<span class="kw">USER</span> <span class="st">node</span></pre>
+      </div>
+      <div class="code-block" style="margin-top:10px;">
+        <div class="code-header"><span class="clabel">Build command</span><button class="copy-btn" onclick="copyCode(this)">copy</button></div>
+        <pre><span class="kw">docker</span> build <span class="fl">-t</span> n8n-ffmpeg .</pre>
+      </div>
+    </div>
+  </div>
+
+  <div class="step-block open" id="w3">
+    <div class="step-header" onclick="toggle('w3')">
+      <div class="sicon">🚀</div>
+      <div class="sinfo">
+        <div class="sname">Container Run + Volume + Auto-restart</div>
+        <div class="smeta">task 6 · port 5678 · C:\n8n-data · restart unless-stopped</div>
+      </div>
+      <div class="stoggle">+</div>
+    </div>
+    <div class="sbody">
+      <div class="code-block">
+        <div class="code-header"><span class="clabel">Docker Run Command</span><button class="copy-btn" onclick="copyCode(this)">copy</button></div>
+        <pre><span class="kw">docker</span> run <span class="fl">-d</span> \
+  <span class="fl">--name</span> n8n \
+  <span class="fl">--restart</span> unless-stopped \
+  <span class="fl">-p</span> <span class="num">5678</span>:<span class="num">5678</span> \
+  <span class="fl">-v</span> <span class="st">C:\n8n-data</span>:/home/node/.n8n \
+  n8n-ffmpeg</pre>
+      </div>
+      <div class="alert success" style="margin-top:10px;">
+        <span class="ai">✅</span>
+        <span><code>C:\n8n-data</code> folder ထဲမှာ workflow data အားလုံး သိမ်းထားမည် — PC restart လုပ်လည်း မပျောက်ဘူး</span>
+      </div>
+    </div>
+  </div>
+
+  <div class="step-block open" id="w4">
+    <div class="step-header" onclick="toggle('w4')">
+      <div class="sicon">⚙️</div>
+      <div class="sinfo">
+        <div class="sname">n8n Workflow ဖန်တီး + FFmpeg Test</div>
+        <div class="smeta">task 8–11 · Manual Trigger → Execute Command → ffmpeg -version</div>
+      </div>
+      <div class="stoggle">+</div>
+    </div>
+    <div class="sbody">
+      <p style="font-family:'Noto Sans Myanmar',sans-serif; font-size:13px; color:var(--muted); margin-bottom:14px; line-height:1.8;">Codex က n8n API ဖြင့် workflow ကို အလိုအလျောက် ဖန်တီးမည်</p>
+
+      <div class="workflow-visual">
+        <div class="wf-node trigger">
+          <div class="node-icon">🖱️</div>
+          <div class="node-name">Manual Trigger</div>
+        </div>
+        <div class="wf-arrow">→</div>
+        <div class="wf-node execute">
+          <div class="node-icon">⚡</div>
+          <div class="node-name">Execute Command</div>
+        </div>
+      </div>
+
+      <div class="code-block" style="margin-top:12px;">
+        <div class="code-header"><span class="clabel">Execute Command node — command</span></div>
+        <pre><span class="ok">ffmpeg -version</span></pre>
+      </div>
+
+      <div class="alert success" style="margin-top:10px;">
+        <span class="ai">✅</span>
+        <span>Output မှာ <code>ffmpeg version 6.x.x</code> ပြနေရင် setup အောင်မြင်သည်</span>
+      </div>
+    </div>
+  </div>
+
+  <div class="divider"></div>
+
+  <!-- AFTER SETUP -->
+  <div class="section-label">
+    <div class="snum icon">💡</div>
+    <div>
+      <div class="stitle">Setup ပြီးနောက် n8n ဝင်ရောက်နည်း</div>
+      <div class="ssub">Codex setup complete ဖြစ်ရင် browser ကနေ n8n ကို ဝင်ရောက်နိုင်သည်</div>
+    </div>
+  </div>
+
+  <div class="step-block open" id="after1">
+    <div class="step-header" onclick="toggle('after1')">
+      <div class="sicon">🌐</div>
+      <div class="sinfo">
+        <div class="sname">Browser မှ n8n ဝင်ရောက်ပါ</div>
+        <div class="smeta">http://localhost:5678</div>
+      </div>
+      <div class="stoggle">+</div>
+    </div>
+    <div class="sbody">
+      <div class="code-block">
+        <div class="code-header"><span class="clabel">Browser URL</span></div>
+        <pre><span class="ok">http://localhost:5678</span></pre>
+      </div>
+      <div class="alert info" style="margin-top:10px;">
+        <span class="ai">ℹ️</span>
+        <span>Container start ဖြစ်ပြီး ၁၅–၃၀ စက္ကန့် ကြာမှ n8n UI ပေါ်လာမည်။ မပေါ်သေးရင် refresh လုပ်ပါ</span>
+      </div>
+    </div>
+  </div>
+
+  <div class="step-block open" id="after2">
+    <div class="step-header" onclick="toggle('after2')">
+      <div class="sicon">🔧</div>
+      <div class="sinfo">
+        <div class="sname">Container Status စစ်ဆေးနည်း</div>
+        <div class="smeta">docker ps · docker logs n8n</div>
+      </div>
+      <div class="stoggle">+</div>
+    </div>
+    <div class="sbody">
+      <div class="code-block">
+        <div class="code-header"><span class="clabel">PowerShell</span><button class="copy-btn" onclick="copyCode(this)">copy</button></div>
+        <pre><span class="cm"># Container run နေမနေ စစ်</span>
+<span class="kw">docker</span> ps
+
+<span class="cm"># Log ကြည့်</span>
+<span class="kw">docker</span> logs n8n
+
+<span class="cm"># n8n restart</span>
+<span class="kw">docker</span> restart n8n
+
+<span class="cm"># FFmpeg ရှိမရှိ စစ်</span>
+<span class="kw">docker</span> exec n8n ffmpeg <span class="fl">-version</span></pre>
+      </div>
+    </div>
+  </div>
+
+  <div class="success-banner">
+    <div class="big-icon">🎉</div>
+    <h2>Setup Complete!</h2>
+    <p>Codex prompt run ပြီးရင် Docker ပေါ်မှာ n8n + FFmpeg<br>အလိုအလျောက် setup ဖြစ်ပြီး browser ကနေ ဝင်ရောက်နိုင်မည်</p>
+    <a class="url-pill" href="http://localhost:5678" target="_blank">🌐 &nbsp; http://localhost:5678</a>
+  </div>
+
+</div>
+
+<script>
+  function toggle(id) {
+    document.getElementById(id).classList.toggle('open');
+  }
+
+  function copyCode(btn) {
+    const pre = btn.closest('.code-block, .dockerfile').querySelector('pre');
+    navigator.clipboard.writeText(pre.innerText.trim()).then(() => {
+      btn.textContent = '✓ copied';
+      btn.classList.add('copied');
+      setTimeout(() => { btn.textContent = 'copy'; btn.classList.remove('copied'); }, 2000);
+    });
+  }
+
+  function copyPrompt(btn) {
+    const text = document.getElementById('promptText').innerText;
+    navigator.clipboard.writeText(text.trim()).then(() => {
+      btn.textContent = '✓ copied!';
+      btn.classList.add('copied');
+      setTimeout(() => { btn.textContent = 'copy all'; btn.classList.remove('copied'); }, 3000);
+    });
+  }
+
+  // Progress bar
+  window.addEventListener('scroll', () => {
+    const pct = window.scrollY / (document.documentElement.scrollHeight - window.innerHeight);
+    document.getElementById('prog').style.width = (pct * 100) + '%';
+  });
+
+  // Entrance animation
+  const blocks = document.querySelectorAll('.step-block');
+  const obs = new IntersectionObserver(entries => {
+    entries.forEach((e, i) => {
+      if (e.isIntersecting) {
+        setTimeout(() => {
+          e.target.style.opacity = '1';
+          e.target.style.transform = 'translateY(0)';
+        }, i * 40);
+        obs.unobserve(e.target);
+      }
+    });
+  }, { threshold: 0.05 });
+
+  blocks.forEach(b => {
+    b.style.opacity = '0';
+    b.style.transform = 'translateY(16px)';
+    b.style.transition = 'opacity 0.35s ease, transform 0.35s ease, border-color 0.2s';
+    obs.observe(b);
+  });
+</script>
+</body>
+</html>
