@@ -705,6 +705,181 @@ abc123def456   docker.n8n.io/n8nio/n8n  Up 30 seconds   0.0.0.0:5678->5678/tcp</
     </div>
   </div>
 
+  <div class="divider"></div>
+
+  <!-- GORDON AI SETUP -->
+  <div class="section-label" style="margin-top:48px;">
+    <div class="snum" style="background:linear-gradient(135deg,#8b5cf6,#ec4899);">🤖</div>
+    <div>
+      <div class="stitle">Gordon AI ဖြင့် Auto Setup (Advanced)</div>
+      <div class="ssub">Docker Desktop ရဲ့ built-in AI agent "Gordon" ကို prompt ပေးပြီး n8n + ffmpeg + Python + ngrok HTTPS အထိ အလိုအလျောက် တည်ဆောက်ခိုင်းနည်း</div>
+    </div>
+  </div>
+
+  <div class="alert info" style="margin-top:4px;">
+    <span class="ai">ℹ️</span>
+    <span>ဤအဆင့်သည် <strong>optional</strong> ဖြစ်သည်။ အထက်က Step 1–6 ဖြင့် basic n8n ရပြီးသားဆိုရင် လုံလောက်ပါသည်။ <strong>Execute Command Node</strong> နှင့် <code>ffmpeg</code>, <code>python3</code> commands ကို workflow ထဲက run ချင်သူများ၊ external webhook အတွက် <strong>HTTPS URL</strong> လိုသူများအတွက်သာ ဤအဆင့်ကို သုံးပါ</span>
+  </div>
+
+  <div class="step-block" id="g1">
+    <div class="step-header" onclick="toggle('g1')">
+      <div class="sicon">🤖</div>
+      <div class="sinfo">
+        <div class="sname">Gordon (Docker AI) ကို ဖွင့်ပါ</div>
+        <div class="smeta">Docker Desktop → Ask Gordon</div>
+      </div>
+      <div class="stoggle">+</div>
+    </div>
+    <div class="sbody">
+      <div class="substep">
+        <div class="ssn">1</div>
+        <div class="ssc">
+          <div class="sst">Docker Desktop ကို update လုပ်ပါ</div>
+          <div class="ssd">Gordon သည် <strong>Docker Desktop 4.38+</strong> မှစ၍ ပါဝင်သည်။ Docker Desktop → Settings → Software updates ကနေ latest version သို့ update လုပ်ပါ</div>
+        </div>
+      </div>
+      <div class="substep">
+        <div class="ssn">2</div>
+        <div class="ssc">
+          <div class="sst">Gordon ကို enable လုပ်ပါ</div>
+          <div class="ssd">Settings → <strong>Beta features</strong> → "Enable Docker AI (Gordon)" ကို အမှန်ခြစ်ပြီး <strong>Apply &amp; restart</strong> နှိပ်ပါ</div>
+        </div>
+      </div>
+      <div class="substep">
+        <div class="ssn">3</div>
+        <div class="ssc">
+          <div class="sst">Gordon chat panel ဖွင့်ပါ</div>
+          <div class="ssd">Docker Desktop ရဲ့ ဘယ်ဘက် sidebar (သို့) အောက်ခြေမှာ <strong>"Ask Gordon"</strong> icon ✨ ပေါ်လာမည် — နှိပ်ဖွင့်ပါ။ ဒါက Docker အတွက် သီးသန့် AI assistant ဖြစ်သည်</div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="step-block" id="g2">
+    <div class="step-header" onclick="toggle('g2')">
+      <div class="sicon">📋</div>
+      <div class="sinfo">
+        <div class="sname">Gordon ကို ဒီ Prompt ကို ပေးပါ</div>
+        <div class="smeta">copy → Gordon chat ထဲ paste</div>
+      </div>
+      <div class="stoggle">+</div>
+    </div>
+    <div class="sbody">
+      <div class="ssd" style="margin-bottom:12px;">အောက်က prompt တစ်ခုလုံးကို <strong>copy</strong> လုပ်ပြီး Gordon chat box ထဲ paste လုပ်ကာ Enter နှိပ်ပါ။ Gordon က အဆင့်လိုက် Docker environment စစ်ဆေး → n8n custom image build → ngrok HTTPS tunnel အထိ လုပ်ဆောင်ပေးမည်</div>
+      <div class="code-block">
+        <div class="code-header"><span class="clabel">Gordon Prompt — full copy</span><button class="copy-btn" onclick="copyCode(this)">copy</button></div>
+        <pre>Act as an expert Docker Desktop and n8n deployment engineer.
+I want you to configure my Windows Docker Desktop environment and set up n8n with HTTPS access and command execution capabilities.
+
+My goal is:
+Windows PC &rarr; Docker Desktop &rarr; n8n container &rarr; HTTPS access using ngrok &rarr; n8n Execute Command Node can run ffmpeg and Python commands
+
+Follow these steps carefully.
+
+1. Check my current Docker Desktop environment
+Before making any changes:
+- Check that Docker Desktop is installed and running.
+- Check Docker version.
+- Check Docker Compose availability.
+- Check existing containers, images, and volumes.
+Do not delete or overwrite existing Docker data without my confirmation.
+My Docker environment is on Windows and Docker Desktop is installed on the C drive.
+Keep all n8n project files in a normal Windows folder, for example: C:\n8n-stack\
+Do not modify Docker Desktop internal storage directly.
+
+2. Install n8n using Docker Compose
+Create a proper n8n Docker setup.
+Requirements:
+- Use the official n8n Docker image.
+- Create docker-compose.yml.
+- Create persistent storage for n8n data.
+- Make sure workflows, credentials, and settings remain after restart.
+- Run n8n on port localhost:5678
+First verify that n8n works through: http://localhost:5678
+
+3. Create a custom n8n Docker image with required tools
+I need to use n8n Execute Command Node for automation tasks.
+Create a custom Dockerfile based on the official n8n image.
+Install required tools inside the n8n container:
+ffmpeg, python3, pip, bash, curl, wget, common Linux utilities
+The final container must allow n8n workflows to execute commands such as:
+ffmpeg -version
+python3 --version
+Verify these commands successfully run from the n8n Execute Command Node.
+
+4. Enable n8n Execute Command Node
+Configure n8n so the Execute Command Node is available and working.
+Test:
+- Run a basic shell command.
+- Run ffmpeg command.
+- Run a Python script.
+Confirm the output is returned inside n8n.
+
+5. Configure HTTPS using ngrok
+I want to convert my local n8n URL http://localhost:5678 into an HTTPS public URL using ngrok.
+I will provide my ngrok authentication token.
+Configure ngrok correctly and create a tunnel to localhost:5678.
+Configure n8n environment variables correctly:
+N8N_HOST, N8N_PROTOCOL, WEBHOOK_URL
+Make sure n8n webhook URLs become:
+https://xxxxx.ngrok.app/webhook/...
+instead of:
+http://localhost:5678/webhook/...
+
+6. Final testing
+After setup, verify everything:
+- Docker container running
+- n8n accessible
+- HTTPS ngrok URL working
+- n8n webhook receives external requests
+- Execute Command Node works
+- ffmpeg works inside n8n
+- Python works inside n8n
+
+Explain each configuration change before applying it.
+If any error occurs, diagnose the root cause and fix it instead of applying random changes.
+My final objective is a local AI automation development environment where n8n can run workflows involving ffmpeg video processing, Python automation scripts, external webhooks through HTTPS, on Docker Desktop for Windows.
+Complete the setup until everything is verified working.</pre>
+      </div>
+      <div class="alert warn" style="margin-top:12px;">
+        <span class="ai">⚠️</span>
+        <span>ngrok token ကို Gordon က တောင်းလာရင်မှ ထည့်ပါ။ Token ကို free signup ဖြင့် ရယူနိုင်သည် —</span>
+      </div>
+      <a class="plink" href="https://dashboard.ngrok.com/get-started/your-authtoken" target="_blank" style="margin-top:8px;display:inline-flex;">ngrok Authtoken ရယူရန်</a>
+    </div>
+  </div>
+
+  <div class="step-block" id="g3">
+    <div class="step-header" onclick="toggle('g3')">
+      <div class="sicon">🎬</div>
+      <div class="sinfo">
+        <div class="sname">Execute Command Node — Test လုပ်ပါ</div>
+        <div class="smeta">ffmpeg + python3 verify</div>
+      </div>
+      <div class="stoggle">+</div>
+    </div>
+    <div class="sbody">
+      <div class="ssd" style="margin-bottom:10px;">Gordon setup ပြီးရင် n8n dashboard မှာ <strong>Execute Command Node</strong> တစ်ခု ထည့်ပြီး အောက်ပါ command များဖြင့် စမ်းသပ်ပါ —</div>
+      <div class="code-block">
+        <div class="code-header"><span class="clabel">Execute Command Node — Command field</span><button class="copy-btn" onclick="copyCode(this)">copy</button></div>
+        <pre><span class="cm"># ffmpeg အလုပ်လုပ်မလုပ် စစ်</span>
+ffmpeg <span class="fl">-version</span>
+
+<span class="cm"># python3 အလုပ်လုပ်မလုပ် စစ်</span>
+python3 <span class="fl">--version</span></pre>
+      </div>
+      <div class="alert success" style="margin-top:10px;">
+        <span class="ai">✅</span>
+        <span>Output မှာ <code>ffmpeg version ...</code> နှင့် <code>Python 3.x.x</code> ထွက်လာရင် — custom image အောင်မြင်ပြီ။ ဒါဆိုရင် n8n workflow ထဲမှာ video processing နှင့် Python automation တွေ တိုက်ရိုက် run နိုင်ပြီ</span>
+      </div>
+      <div class="alert warn" style="margin-top:8px;">
+        <span class="ai">⚠️</span>
+        <span><code>command not found</code> ထွက်ရင် — official image အစား Gordon build ပေးထားတဲ့ <strong>custom image</strong> (Step 3) ကို container run လုပ်ထားခြင်း ရှိ/မရှိ ပြန်စစ်ပါ။ Gordon ကို "the container is not using the custom image, please rebuild and rerun" လို့ ပြန်ပြောပါ</span>
+      </div>
+    </div>
+  </div>
+
+
 
   <!-- TROUBLESHOOTING -->
   <div class="section-label" style="margin-top:48px;">
